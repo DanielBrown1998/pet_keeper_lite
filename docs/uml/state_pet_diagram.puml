@@ -1,0 +1,99 @@
+@startuml PetBloc_StateDiagram
+!theme plain
+skinparam state {
+    BackgroundColor<<initial>> LightGray
+    BackgroundColor<<loading>> LightYellow
+    BackgroundColor<<success>> LightGreen
+    BackgroundColor<<error>> LightCoral
+}
+
+title Diagrama de Estado - PetBloc
+footer PetKeeper Lite - CRUD de Pets
+
+[*] --> PetInitialState : Bloc criado
+
+state PetInitialState <<initial>> {
+    state "Aguardando familyCode" as initial_desc
+}
+
+state PetLoadingState <<loading>> {
+    state "pets: List<PetEntity>" as loading_pets
+    state "submitting: bool" as loading_submitting
+    loading_pets : submitting = false: Carregando lista
+    loading_submitting : submitting = true: Salvando/Deletando
+}
+
+state PetSuccessState <<success>> {
+    state "pets: List<PetEntity>" as success_pets
+    state "successMessage: String?" as success_msg
+}
+
+state PetErrorState <<error>> {
+    state "pets: List<PetEntity>" as error_pets
+    state "error: String" as error_msg
+}
+
+' ================== TRANSITIONS ==================
+
+' From Initial
+PetInitialState --> PetLoadingState : WatchPetsRequested(familyCode)\n/ submitting = false
+
+' From Loading (watching)
+PetLoadingState --> PetSuccessState : [stream emitiu lista]\n/ pets = newPets
+PetLoadingState --> PetErrorState : [erro no stream]\n/ error = "Falha ao carregar"
+
+' Create Pet
+PetSuccessState --> PetLoadingState : CreatePetRequested(pet)\n/ submitting = true
+PetLoadingState --> PetSuccessState : [pet criado]\n/ successMessage = "Pet cadastrado!"
+
+' Update Pet
+PetSuccessState --> PetLoadingState : UpdatePetRequested(pet)\n/ submitting = true
+PetLoadingState --> PetSuccessState : [pet atualizado]\n/ successMessage = "Pet atualizado!"
+
+' Delete Pet
+PetSuccessState --> PetLoadingState : DeletePetRequested(petId)\n/ submitting = true
+PetLoadingState --> PetSuccessState : [pet excluído]\n/ successMessage = "Pet excluído!"
+
+' Upload Photo
+PetSuccessState --> PetLoadingState : UploadPhotoRequested(petId, file)\n/ submitting = true
+PetLoadingState --> PetSuccessState : [foto enviada]\n/ successMessage = "Foto atualizada!"
+
+' Error handling
+PetLoadingState --> PetErrorState : [erro na operação]\n/ error = "mensagem"
+
+' From Error
+PetErrorState --> PetLoadingState : RetryRequested
+PetErrorState --> PetSuccessState : [stream emitiu nova lista]\n/ limpar erro
+
+' Stream updates (real-time)
+PetSuccessState --> PetSuccessState : [stream update]\n/ pets = updatedPets
+
+' ================== NOTES ==================
+note right of PetInitialState
+  Estado inicial.
+  Aguarda o familyCode
+  do usuário autenticado.
+end note
+
+note right of PetLoadingState
+  Dois modos:
+  **submitting = false**: Carregando lista inicial
+  **submitting = true**: Criando/Editando/Deletando
+  
+  Mantém lista atual enquanto opera.
+end note
+
+note right of PetSuccessState
+  Lista de pets atualizada
+  em tempo real via Stream.
+  
+  successMessage limpa após exibição.
+end note
+
+note left of PetErrorState
+  Mantém a lista de pets
+  mesmo em caso de erro,
+  permitindo retry.
+end note
+
+@enduml

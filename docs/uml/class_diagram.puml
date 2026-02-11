@@ -1,0 +1,527 @@
+@startuml PetKeeperLite_ClassDiagram
+!theme plain
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+title Diagrama de Classes - PetKeeper Lite
+footer Clean Architecture com Flutter/Bloc
+
+' ================== DOMAIN LAYER ==================
+package "Domain Layer" #E8F5E9 {
+    
+    package "Entities" #C8E6C9 {
+        class UserEntity <<entity>> {
+            +uid: String
+            +email: String
+            +displayName: String?
+            +familyCode: String?
+            +fcmTokens: List<String>
+            --
+            +copyWith(): UserEntity
+            +props: List<Object?>
+        }
+        
+        class FamilyEntity <<entity>> {
+            +familyCode: String
+            +createdAt: DateTime
+            +ownerUid: String
+            --
+            +props: List<Object?>
+        }
+        
+        class PetEntity <<entity>> {
+            +id: String
+            +familyCode: String
+            +name: String
+            +species: String
+            +birthDate: DateTime?
+            +weightKg: double?
+            +photoUrl: String?
+            +createdAt: DateTime
+            --
+            +copyWith(): PetEntity
+            +props: List<Object?>
+        }
+        
+        class PetTaskEntity <<entity>> {
+            +id: String
+            +petId: String
+            +type: TaskType
+            +title: String
+            +dueDate: DateTime?
+            +notes: String?
+            +createdBy: String
+            +createdAt: DateTime
+            +done: bool
+            --
+            +copyWith(): PetTaskEntity
+            +props: List<Object?>
+        }
+        
+        enum TaskType <<enumeration>> {
+            vaccine
+            grooming
+            other
+        }
+    }
+    
+    package "Repositories (Contracts)" #A5D6A7 {
+        interface IAuthRepository <<repository>> {
+            +signInWithEmail(email, password): Future<Either<Failure, UserEntity>>
+            +signUpWithEmail(email, password, name): Future<Either<Failure, UserEntity>>
+            +signInWithGoogle(): Future<Either<Failure, UserEntity>>
+            +signOut(): Future<Either<Failure, void>>
+            +getCurrentUser(): Future<Either<Failure, UserEntity?>>
+            +watchAuthState(): Stream<UserEntity?>
+            +updateFcmToken(uid, token): Future<Either<Failure, void>>
+            +updateUserProfile(user): Future<Either<Failure, UserEntity>>
+        }
+        
+        interface IFamilyRepository <<repository>> {
+            +createFamily(ownerUid): Future<Either<Failure, FamilyEntity>>
+            +joinFamily(uid, familyCode): Future<Either<Failure, FamilyEntity>>
+            +getFamily(familyCode): Future<Either<Failure, FamilyEntity?>>
+            +checkFamilyExists(familyCode): Future<Either<Failure, bool>>
+        }
+        
+        interface IPetRepository <<repository>> {
+            +createPet(pet, imageFile?): Future<Either<Failure, PetEntity>>
+            +updatePet(pet, imageFile?): Future<Either<Failure, PetEntity>>
+            +deletePet(petId): Future<Either<Failure, void>>
+            +getPet(petId): Future<Either<Failure, PetEntity?>>
+            +watchPets(familyCode): Stream<List<PetEntity>>
+        }
+        
+        interface ITaskRepository <<repository>> {
+            +createTask(task): Future<Either<Failure, PetTaskEntity>>
+            +updateTask(task): Future<Either<Failure, PetTaskEntity>>
+            +deleteTask(taskId): Future<Either<Failure, void>>
+            +getTask(taskId): Future<Either<Failure, PetTaskEntity?>>
+            +toggleTaskDone(taskId, done): Future<Either<Failure, PetTaskEntity>>
+            +watchTasks(petId): Stream<List<PetTaskEntity>>
+        }
+        
+        interface INotificationRepository <<repository>> {
+            +getFcmToken(): Future<Either<Failure, String?>>
+            +setupFcmToken(uid): Future<Either<Failure, void>>
+            +notifyFamily(familyCode, title, body): Future<Either<Failure, void>>
+            +requestPermission(): Future<Either<Failure, bool>>
+        }
+    }
+    
+    package "Use Cases" #81C784 {
+        abstract class UseCase<Type, Params> <<usecase>> {
+            +{abstract} call(params): Future<Either<Failure, Type>>
+        }
+        
+        package "Auth" {
+            class SignInWithEmail <<usecase>>
+            class SignUpWithEmail <<usecase>>
+            class SignInWithGoogle <<usecase>>
+            class SignOut <<usecase>>
+            class GetCurrentUser <<usecase>>
+            class WatchAuthState <<usecase>>
+            class UpdateFcmToken <<usecase>>
+            class UpdateUserProfile <<usecase>>
+        }
+        
+        package "Family" {
+            class CreateFamily <<usecase>>
+            class JoinFamily <<usecase>>
+            class GetFamily <<usecase>>
+            class CheckFamilyExists <<usecase>>
+        }
+        
+        package "Pet" {
+            class CreatePet <<usecase>>
+            class UpdatePet <<usecase>>
+            class DeletePet <<usecase>>
+            class GetPet <<usecase>>
+            class WatchPets <<usecase>>
+        }
+        
+        package "Task" {
+            class CreateTask <<usecase>>
+            class UpdateTask <<usecase>>
+            class DeleteTask <<usecase>>
+            class GetTask <<usecase>>
+            class ToggleTaskDone <<usecase>>
+            class WatchTasks <<usecase>>
+        }
+        
+        package "Notification" {
+            class GetFcmToken <<usecase>>
+            class SetupFcmToken <<usecase>>
+            class NotifyFamily <<usecase>>
+            class RequestNotificationPermission <<usecase>>
+        }
+    }
+}
+
+' ================== DATA LAYER ==================
+package "Data Layer" #E3F2FD {
+    
+    package "Models" #BBDEFB {
+        class UserModel <<model>> {
+            +uid: String
+            +email: String
+            +displayName: String?
+            +familyCode: String?
+            +fcmTokens: List<String>
+            --
+            +fromFirestore(doc): UserModel
+            +toFirestore(): Map<String, dynamic>
+            +toEntity(): UserEntity
+        }
+        
+        class FamilyModel <<model>> {
+            +familyCode: String
+            +createdAt: DateTime
+            +ownerUid: String
+            --
+            +fromFirestore(doc): FamilyModel
+            +toFirestore(): Map<String, dynamic>
+            +toEntity(): FamilyEntity
+        }
+        
+        class PetModel <<model>> {
+            +id: String
+            +familyCode: String
+            +name: String
+            +species: String
+            +birthDate: DateTime?
+            +weightKg: double?
+            +photoUrl: String?
+            +createdAt: DateTime
+            --
+            +fromFirestore(doc): PetModel
+            +toFirestore(): Map<String, dynamic>
+            +toEntity(): PetEntity
+        }
+        
+        class PetTaskModel <<model>> {
+            +id: String
+            +petId: String
+            +type: String
+            +title: String
+            +dueDate: DateTime?
+            +notes: String?
+            +createdBy: String
+            +createdAt: DateTime
+            +done: bool
+            --
+            +fromFirestore(doc): PetTaskModel
+            +toFirestore(): Map<String, dynamic>
+            +toEntity(): PetTaskEntity
+        }
+    }
+    
+    package "Sources (Contracts)" #90CAF9 {
+        interface IAuthRemoteDataSource <<source>> {
+            +signInWithEmail(email, password): Future<UserModel>
+            +signUpWithEmail(email, password, name): Future<UserModel>
+            +signOut(): Future<void>
+            +getCurrentUser(): Future<UserModel?>
+            +watchAuthState(): Stream<UserModel?>
+            +updateFcmToken(uid, token): Future<void>
+            +updateUserProfile(user): Future<UserModel>
+        }
+        
+        interface IGoogleAuthRemoteDataSource <<source>> {
+            +signInWithGoogle(): Future<UserModel>
+        }
+        
+        interface IFamilyRemoteDataSource <<source>> {
+            +createFamily(ownerUid): Future<FamilyModel>
+            +joinFamily(uid, familyCode): Future<FamilyModel>
+            +getFamily(familyCode): Future<FamilyModel?>
+            +checkFamilyExists(familyCode): Future<bool>
+        }
+        
+        interface IPetRemoteDataSource <<source>> {
+            +createPet(pet, imageFile?): Future<PetModel>
+            +updatePet(pet, imageFile?): Future<PetModel>
+            +deletePet(petId): Future<void>
+            +getPet(petId): Future<PetModel?>
+            +watchPets(familyCode): Stream<List<PetModel>>
+        }
+        
+        interface ITaskRemoteDataSource <<source>> {
+            +createTask(task): Future<PetTaskModel>
+            +updateTask(task): Future<PetTaskModel>
+            +deleteTask(taskId): Future<void>
+            +getTask(taskId): Future<PetTaskModel?>
+            +toggleTaskDone(taskId, done): Future<PetTaskModel>
+            +watchTasks(petId): Stream<List<PetTaskModel>>
+        }
+        
+        interface INotificationRemoteDataSource <<source>> {
+            +getFcmToken(): Future<String?>
+            +setupFcmToken(uid): Future<void>
+            +notifyFamily(familyCode, title, body): Future<void>
+            +requestPermission(): Future<bool>
+        }
+    }
+    
+    package "Sources (Implementations)" #64B5F6 {
+        class AuthRemoteDataSourceImpl <<source>>
+        class GoogleAuthRemoteDataSourceImpl <<source>>
+        class FamilyRemoteDataSourceImpl <<source>>
+        class PetRemoteDataSourceImpl <<source>>
+        class TaskRemoteDataSourceImpl <<source>>
+        class NotificationRemoteDataSourceImpl <<source>>
+    }
+    
+    package "Repositories (Implementations)" #42A5F5 {
+        class AuthRepositoryImpl <<repository>>
+        class FamilyRepositoryImpl <<repository>>
+        class PetRepositoryImpl <<repository>>
+        class TaskRepositoryImpl <<repository>>
+        class NotificationRepositoryImpl <<repository>>
+    }
+}
+
+' ================== PRESENTATION LAYER ==================
+package "Presentation Layer" #FFF3E0 {
+    
+    package "Blocs" #FFE0B2 {
+        class AuthBloc <<bloc>> {
+            -signInWithEmail: SignInWithEmail
+            -signUpWithEmail: SignUpWithEmail
+            -signInWithGoogle: SignInWithGoogle
+            -signOut: SignOut
+            -watchAuthState: WatchAuthState
+            -getCurrentUser: GetCurrentUser
+            -setupFcmToken: SetupFcmToken
+            --
+            +add(AuthEvent): void
+            +state: AuthState
+        }
+        
+        class FamilyBloc <<bloc>> {
+            -createFamily: CreateFamily
+            -joinFamily: JoinFamily
+            -checkFamilyExists: CheckFamilyExists
+            -getFamily: GetFamily
+            --
+            +add(FamilyEvent): void
+            +state: FamilyState
+        }
+        
+        class PetBloc <<bloc>> {
+            -createPet: CreatePet
+            -updatePet: UpdatePet
+            -deletePet: DeletePet
+            -watchPets: WatchPets
+            --
+            +add(PetEvent): void
+            +state: PetState
+        }
+        
+        class TaskBloc <<bloc>> {
+            -createTask: CreateTask
+            -updateTask: UpdateTask
+            -deleteTask: DeleteTask
+            -toggleTaskDone: ToggleTaskDone
+            -watchTasks: WatchTasks
+            --
+            +add(TaskEvent): void
+            +state: TaskState
+        }
+        
+        class NotificationBloc <<bloc>> {
+            -notifyFamily: NotifyFamily
+            -setupFcmToken: SetupFcmToken
+            -requestPermission: RequestNotificationPermission
+            --
+            +add(NotificationEvent): void
+            +state: NotificationState
+        }
+    }
+    
+    package "States" #FFCC80 {
+        abstract class AuthState <<state>>
+        class AuthUnknownState <<state>>
+        class AuthLoadingState <<state>>
+        class AuthAuthenticatedState <<state>>
+        class AuthUnauthenticatedState <<state>>
+        
+        abstract class FamilyState <<state>>
+        class FamilyInitialState <<state>>
+        class FamilyLoadingState <<state>>
+        class FamilySuccessState <<state>>
+        class FamilyErrorState <<state>>
+        
+        abstract class PetState <<state>>
+        class PetInitialState <<state>>
+        class PetLoadingState <<state>>
+        class PetSuccessState <<state>>
+        class PetErrorState <<state>>
+        
+        abstract class TaskState <<state>>
+        class TaskInitialState <<state>>
+        class TaskLoadingState <<state>>
+        class TaskSuccessState <<state>>
+        class TaskEmptyState <<state>>
+        class TaskErrorState <<state>>
+        
+        abstract class NotificationState <<state>>
+        class NotificationInitialState <<state>>
+        class NotificationSendingState <<state>>
+        class NotificationSuccessState <<state>>
+        class NotificationErrorState <<state>>
+    }
+}
+
+' ================== CORE LAYER ==================
+package "Core" #F3E5F5 {
+    abstract class Failure <<error>> {
+        +message: String
+    }
+    
+    class ServerFailure <<error>>
+    class AuthFailure <<error>>
+    class NetworkFailure <<error>>
+    class CacheFailure <<error>>
+}
+
+' ================== RELATIONSHIPS ==================
+
+' Entities relationships
+PetTaskEntity --> TaskType
+PetTaskEntity "0..*" --o "1" PetEntity : petId
+PetEntity "0..*" --o "1" FamilyEntity : familyCode
+UserEntity "0..*" --o "0..1" FamilyEntity : familyCode
+
+' Models extend/implement Entities
+UserModel ..|> UserEntity : toEntity()
+FamilyModel ..|> FamilyEntity : toEntity()
+PetModel ..|> PetEntity : toEntity()
+PetTaskModel ..|> PetTaskEntity : toEntity()
+
+' Repository implementations
+AuthRepositoryImpl ..|> IAuthRepository
+FamilyRepositoryImpl ..|> IFamilyRepository
+PetRepositoryImpl ..|> IPetRepository
+TaskRepositoryImpl ..|> ITaskRepository
+NotificationRepositoryImpl ..|> INotificationRepository
+
+' Source implementations
+AuthRemoteDataSourceImpl ..|> IAuthRemoteDataSource
+GoogleAuthRemoteDataSourceImpl ..|> IGoogleAuthRemoteDataSource
+FamilyRemoteDataSourceImpl ..|> IFamilyRemoteDataSource
+PetRemoteDataSourceImpl ..|> IPetRemoteDataSource
+TaskRemoteDataSourceImpl ..|> ITaskRemoteDataSource
+NotificationRemoteDataSourceImpl ..|> INotificationRemoteDataSource
+
+' Repository depends on Sources
+AuthRepositoryImpl --> IAuthRemoteDataSource
+AuthRepositoryImpl --> IGoogleAuthRemoteDataSource
+FamilyRepositoryImpl --> IFamilyRemoteDataSource
+PetRepositoryImpl --> IPetRemoteDataSource
+TaskRepositoryImpl --> ITaskRemoteDataSource
+NotificationRepositoryImpl --> INotificationRemoteDataSource
+
+' UseCases depend on Repositories
+SignInWithEmail --> IAuthRepository
+SignUpWithEmail --> IAuthRepository
+SignInWithGoogle --> IAuthRepository
+SignOut --> IAuthRepository
+GetCurrentUser --> IAuthRepository
+WatchAuthState --> IAuthRepository
+UpdateFcmToken --> IAuthRepository
+UpdateUserProfile --> IAuthRepository
+
+CreateFamily --> IFamilyRepository
+JoinFamily --> IFamilyRepository
+GetFamily --> IFamilyRepository
+CheckFamilyExists --> IFamilyRepository
+
+CreatePet --> IPetRepository
+UpdatePet --> IPetRepository
+DeletePet --> IPetRepository
+GetPet --> IPetRepository
+WatchPets --> IPetRepository
+
+CreateTask --> ITaskRepository
+UpdateTask --> ITaskRepository
+DeleteTask --> ITaskRepository
+GetTask --> ITaskRepository
+ToggleTaskDone --> ITaskRepository
+WatchTasks --> ITaskRepository
+
+GetFcmToken --> INotificationRepository
+SetupFcmToken --> INotificationRepository
+NotifyFamily --> INotificationRepository
+RequestNotificationPermission --> INotificationRepository
+
+' Blocs depend on UseCases
+AuthBloc --> SignInWithEmail
+AuthBloc --> SignUpWithEmail
+AuthBloc --> SignInWithGoogle
+AuthBloc --> SignOut
+AuthBloc --> WatchAuthState
+AuthBloc --> GetCurrentUser
+AuthBloc --> SetupFcmToken
+
+FamilyBloc --> CreateFamily
+FamilyBloc --> JoinFamily
+FamilyBloc --> CheckFamilyExists
+FamilyBloc --> GetFamily
+
+PetBloc --> CreatePet
+PetBloc --> UpdatePet
+PetBloc --> DeletePet
+PetBloc --> WatchPets
+
+TaskBloc --> CreateTask
+TaskBloc --> UpdateTask
+TaskBloc --> DeleteTask
+TaskBloc --> ToggleTaskDone
+TaskBloc --> WatchTasks
+
+NotificationBloc --> NotifyFamily
+NotificationBloc --> SetupFcmToken
+NotificationBloc --> RequestNotificationPermission
+
+' States hierarchy
+AuthUnknownState --|> AuthState
+AuthLoadingState --|> AuthState
+AuthAuthenticatedState --|> AuthState
+AuthUnauthenticatedState --|> AuthState
+
+FamilyInitialState --|> FamilyState
+FamilyLoadingState --|> FamilyState
+FamilySuccessState --|> FamilyState
+FamilyErrorState --|> FamilyState
+
+PetInitialState --|> PetState
+PetLoadingState --|> PetState
+PetSuccessState --|> PetState
+PetErrorState --|> PetState
+
+TaskInitialState --|> TaskState
+TaskLoadingState --|> TaskState
+TaskSuccessState --|> TaskState
+TaskEmptyState --|> TaskState
+TaskErrorState --|> TaskState
+
+NotificationInitialState --|> NotificationState
+NotificationSendingState --|> NotificationState
+NotificationSuccessState --|> NotificationState
+NotificationErrorState --|> NotificationState
+
+' Blocs emit States
+AuthBloc ..> AuthState : emits
+FamilyBloc ..> FamilyState : emits
+PetBloc ..> PetState : emits
+TaskBloc ..> TaskState : emits
+NotificationBloc ..> NotificationState : emits
+
+' Failure hierarchy
+ServerFailure --|> Failure
+AuthFailure --|> Failure
+NetworkFailure --|> Failure
+CacheFailure --|> Failure
+
+@enduml

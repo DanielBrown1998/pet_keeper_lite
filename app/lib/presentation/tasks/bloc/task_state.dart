@@ -30,6 +30,14 @@ sealed class TaskState extends Equatable {
   /// Tarefas de vacina
   List<PetTaskEntity> get vaccineTasks =>
       tasks.where((t) => t.type == TaskType.vaccine).toList();
+
+  PetTaskEntity? getTaskById(String taskId) {
+    try {
+      return tasks.firstWhere((task) => task.id == taskId);
+    } catch (e) {
+      return null;
+    }
+  }
 }
 
 /// Estado inicial

@@ -19,6 +19,14 @@ sealed class PetState extends Equatable {
       this is PetLoadingState && (this as PetLoadingState).submitting;
   bool get isError => this is PetErrorState;
   bool get isSuccess => this is PetSuccessState;
+
+  PetEntity? getPetById(String petId) {
+    try {
+      return pets.firstWhere((pet) => pet.id == petId);
+    } catch (e) {
+      return null;
+    }
+  }
 }
 
 /// Estado inicial - app acabou de abrir

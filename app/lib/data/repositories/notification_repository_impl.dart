@@ -2,13 +2,14 @@ import 'package:dartz/dartz.dart';
 
 import '../../core/error/failures.dart';
 import '../../domain/repositories/notification_repository.dart';
-import '../sources/notification_source.dart';
+import '../sources/notification_remote_data_source.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
-  final NotificationSource _notificationSource;
+  final NotificationRemoteDataSource _notificationRemoteDataSource;
 
-  NotificationRepositoryImpl({required NotificationSource notificationSource})
-    : _notificationSource = notificationSource;
+  NotificationRepositoryImpl({
+    required NotificationRemoteDataSource notificationRemoteDataSource,
+  }) : _notificationRemoteDataSource = notificationRemoteDataSource;
 
   @override
   Future<Either<Failure, void>> notifyFamily({
@@ -16,7 +17,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
     required String message,
   }) async {
     try {
-      await _notificationSource.notifyFamily(petId: petId, message: message);
+      await _notificationRemoteDataSource.notifyFamily(
+        petId: petId,
+        message: message,
+      );
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -26,7 +30,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   Future<Either<Failure, String?>> getToken() async {
     try {
-      final token = await _notificationSource.getToken();
+      final token = await _notificationRemoteDataSource.getToken();
       return Right(token);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -36,7 +40,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   Future<Either<Failure, void>> requestPermission() async {
     try {
-      await _notificationSource.requestPermission();
+      await _notificationRemoteDataSource.requestPermission();
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

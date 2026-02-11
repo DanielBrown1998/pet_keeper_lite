@@ -1,0 +1,88 @@
+@startuml FamilyBloc_StateDiagram
+!theme plain
+skinparam state {
+    BackgroundColor<<initial>> LightGray
+    BackgroundColor<<loading>> LightYellow
+    BackgroundColor<<success>> LightGreen
+    BackgroundColor<<error>> LightCoral
+}
+
+title Diagrama de Estado - FamilyBloc
+footer PetKeeper Lite - Onboarding Família
+
+[*] --> FamilyInitialState : Bloc criado
+
+state FamilyInitialState <<initial>> {
+    state "Aguardando ação do usuário" as initial_desc
+}
+
+state FamilyLoadingState <<loading>> {
+    state "Processando operação..." as loading_desc
+}
+
+state FamilySuccessState <<success>> {
+    state "family: FamilyEntity?" as success_family
+    state "familyExists: bool" as success_exists
+}
+
+state FamilyErrorState <<error>> {
+    state "error: String" as error_msg
+}
+
+' ================== TRANSITIONS ==================
+
+' From Initial
+FamilyInitialState --> FamilyLoadingState : CreateFamilyRequested
+FamilyInitialState --> FamilyLoadingState : JoinFamilyRequested(code)
+FamilyInitialState --> FamilyLoadingState : CheckFamilyExistsRequested(code)
+FamilyInitialState --> FamilyLoadingState : GetFamilyRequested(code)
+
+' From Loading - Create Family
+FamilyLoadingState --> FamilySuccessState : [família criada]\n/ family = newFamily
+FamilyLoadingState --> FamilyErrorState : [erro ao criar]\n/ error = "Falha ao criar família"
+
+' From Loading - Join Family
+FamilyLoadingState --> FamilySuccessState : [entrada bem sucedida]\n/ family = existingFamily
+FamilyLoadingState --> FamilyErrorState : [código inválido]\n/ error = "Família não encontrada"
+
+' From Loading - Check Exists
+FamilyLoadingState --> FamilySuccessState : [verificação concluída]\n/ familyExists = true|false
+
+' From Success
+FamilySuccessState --> FamilyInitialState : ResetFamilyState
+FamilySuccessState --> FamilyLoadingState : RefreshFamilyRequested
+
+' From Error
+FamilyErrorState --> FamilyInitialState : ResetFamilyState
+FamilyErrorState --> FamilyLoadingState : RetryRequested
+
+' ================== NOTES ==================
+note right of FamilyInitialState
+  Usuário autenticado mas
+  ainda não pertence a
+  nenhuma família.
+end note
+
+note right of FamilySuccessState
+  Operação concluída:
+  - Família criada (code gerado)
+  - Entrada na família
+  - Verificação de existência
+end note
+
+note left of FamilyErrorState
+  Erros possíveis:
+  - Código não existe
+  - Falha de conexão
+  - Erro do servidor
+end note
+
+note bottom of FamilyLoadingState
+  Operações:
+  - Criar nova família
+  - Entrar com código
+  - Verificar existência
+  - Buscar dados da família
+end note
+
+@enduml

@@ -1,0 +1,116 @@
+@startuml TaskBloc_StateDiagram
+!theme plain
+skinparam state {
+    BackgroundColor<<initial>> LightGray
+    BackgroundColor<<loading>> LightYellow
+    BackgroundColor<<success>> LightGreen
+    BackgroundColor<<empty>> LightBlue
+    BackgroundColor<<error>> LightCoral
+}
+
+title Diagrama de Estado - TaskBloc
+footer PetKeeper Lite - Vacinas/Tarefas
+
+[*] --> TaskInitialState : Bloc criado
+
+state TaskInitialState <<initial>> {
+    state "Aguardando petId" as initial_desc
+}
+
+state TaskLoadingState <<loading>> {
+    state "tasks: List<PetTaskEntity>" as loading_tasks
+    state "submitting: bool" as loading_submitting
+    loading_tasks : submitting = false: Carregando lista
+    loading_submitting : submitting = true: Salvando/Deletando
+}
+
+state TaskSuccessState <<success>> {
+    state "tasks: List<PetTaskEntity>" as success_tasks
+    state "successMessage: String?" as success_msg
+    success_tasks : pendingTasks: List<PetTaskEntity>
+    success_tasks : completedTasks: List<PetTaskEntity>
+    success_tasks : vaccineTasks: List<PetTaskEntity>
+}
+
+state TaskEmptyState <<empty>> {
+    state "Nenhuma tarefa cadastrada" as empty_desc
+}
+
+state TaskErrorState <<error>> {
+    state "tasks: List<PetTaskEntity>" as error_tasks
+    state "error: String" as error_msg
+}
+
+' ================== TRANSITIONS ==================
+
+' From Initial
+TaskInitialState --> TaskLoadingState : WatchTasksRequested(petId)\n/ submitting = false
+
+' From Loading (watching)
+TaskLoadingState --> TaskSuccessState : [stream emitiu lista não vazia]\n/ tasks = newTasks
+TaskLoadingState --> TaskEmptyState : [stream emitiu lista vazia]
+TaskLoadingState --> TaskErrorState : [erro no stream]\n/ error = "Falha ao carregar"
+
+' Create Task
+TaskSuccessState --> TaskLoadingState : CreateTaskRequested(task)\n/ submitting = true
+TaskEmptyState --> TaskLoadingState : CreateTaskRequested(task)\n/ submitting = true
+TaskLoadingState --> TaskSuccessState : [tarefa criada]\n/ successMessage = "Tarefa criada!"
+
+' Update Task
+TaskSuccessState --> TaskLoadingState : UpdateTaskRequested(task)\n/ submitting = true
+TaskLoadingState --> TaskSuccessState : [tarefa atualizada]\n/ successMessage = "Tarefa atualizada!"
+
+' Toggle Done
+TaskSuccessState --> TaskLoadingState : ToggleTaskDoneRequested(taskId, done)\n/ submitting = true
+TaskLoadingState --> TaskSuccessState : [status alterado]\n/ successMessage = done ? "Concluída!" : "Reaberta"
+
+' Delete Task
+TaskSuccessState --> TaskLoadingState : DeleteTaskRequested(taskId)\n/ submitting = true
+TaskLoadingState --> TaskSuccessState : [tarefa excluída]\n/ successMessage = "Tarefa excluída!"
+TaskLoadingState --> TaskEmptyState : [última tarefa excluída]
+
+' Error handling
+TaskLoadingState --> TaskErrorState : [erro na operação]\n/ error = "mensagem"
+
+' From Error
+TaskErrorState --> TaskLoadingState : RetryRequested
+TaskErrorState --> TaskSuccessState : [stream emitiu nova lista]
+
+' Stream updates (real-time)
+TaskSuccessState --> TaskSuccessState : [stream update com tarefas]\n/ tasks = updatedTasks
+TaskSuccessState --> TaskEmptyState : [stream update vazio]
+TaskEmptyState --> TaskSuccessState : [stream update com tarefas]
+
+' ================== NOTES ==================
+note right of TaskInitialState
+  Estado inicial.
+  Aguarda o petId para
+  iniciar o watch.
+end note
+
+note right of TaskLoadingState
+  Dois modos:
+  **submitting = false**: Carregando lista
+  **submitting = true**: CRUD em andamento
+  
+  Mantém lista atual enquanto opera.
+end note
+
+note right of TaskSuccessState
+  Propriedades computadas:
+  - pendingTasks: !done
+  - completedTasks: done
+  - vaccineTasks: type == vaccine
+end note
+
+note left of TaskEmptyState
+  Pet não possui tarefas.
+  Permite criar primeira tarefa.
+end note
+
+note left of TaskErrorState
+  Mantém a lista de tarefas
+  mesmo em caso de erro.
+end note
+
+@enduml

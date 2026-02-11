@@ -1,15 +1,17 @@
+import 'package:flutter/material.dart';
+
 /// Enum representing all supported pet species.
 /// Use this instead of raw strings to ensure data consistency.
 enum PetSpecies {
-  dog('dog', 'Cachorro', '🐕'),
-  cat('cat', 'Gato', '🐈'),
-  bird('bird', 'Pássaro', '🐦'),
-  fish('fish', 'Peixe', '🐟'),
-  rabbit('rabbit', 'Coelho', '🐰'),
-  hamster('hamster', 'Hamster', '🐹'),
-  other('other', 'Outro', '🐾');
+  dog('dog', 'Cachorro', '🐕', Icons.pets),
+  cat('cat', 'Gato', '🐈', Icons.pets),
+  bird('bird', 'Pássaro', '🐦', Icons.flutter_dash),
+  fish('fish', 'Peixe', '🐟', Icons.water),
+  rabbit('rabbit', 'Coelho', '🐰', Icons.pets),
+  hamster('hamster', 'Hamster', '🐹', Icons.pets),
+  other('other', 'Outro', '🐾', Icons.pets);
 
-  const PetSpecies(this.value, this.displayName, this.emoji);
+  const PetSpecies(this.value, this.displayName, this.emoji, this.icon);
 
   /// The value stored in the database
   final String value;
@@ -19,6 +21,9 @@ enum PetSpecies {
 
   /// Emoji representation for UI
   final String emoji;
+
+  /// Icon representation for UI
+  final IconData icon;
 
   /// Get display name with emoji
   String get displayNameWithEmoji => '$emoji $displayName';

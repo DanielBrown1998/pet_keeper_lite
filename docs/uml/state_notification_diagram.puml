@@ -1,0 +1,99 @@
+@startuml NotificationBloc_StateDiagram
+!theme plain
+skinparam state {
+    BackgroundColor<<initial>> LightGray
+    BackgroundColor<<sending>> LightYellow
+    BackgroundColor<<success>> LightGreen
+    BackgroundColor<<error>> LightCoral
+}
+
+title Diagrama de Estado - NotificationBloc
+footer PetKeeper Lite - Push Notifications
+
+[*] --> NotificationInitialState : Bloc criado
+
+state NotificationInitialState <<initial>> {
+    state "Aguardando ação" as initial_desc
+}
+
+state NotificationSendingState <<sending>> {
+    state "Enviando notificação..." as sending_desc
+}
+
+state NotificationSuccessState <<success>> {
+    state "message: String" as success_msg
+}
+
+state NotificationErrorState <<error>> {
+    state "error: String" as error_msg
+}
+
+' ================== TRANSITIONS ==================
+
+' From Initial
+NotificationInitialState --> NotificationSendingState : NotifyFamilyRequested\n(familyCode, petName)
+
+' From Sending
+NotificationSendingState --> NotificationSuccessState : [FCM enviado com sucesso]\n/ message = "Família notificada!"
+NotificationSendingState --> NotificationErrorState : [falha no envio]\n/ error = "Falha ao notificar"
+
+' From Success
+NotificationSuccessState --> NotificationInitialState : ResetNotificationState
+NotificationSuccessState --> NotificationSendingState : NotifyFamilyRequested\n(nova notificação)
+
+' From Error
+NotificationErrorState --> NotificationInitialState : ResetNotificationState
+NotificationErrorState --> NotificationSendingState : RetryNotifyRequested
+
+' ================== COMPOSITE STATE - FCM SETUP ==================
+
+state "Setup FCM (Background)" as FCMSetup {
+    state "Solicitar Permissão" as RequestPermission
+    state "Obter Token" as GetToken
+    state "Salvar Token" as SaveToken
+    
+    [*] --> RequestPermission
+    RequestPermission --> GetToken : [permissão concedida]
+    RequestPermission --> [*] : [permissão negada]
+    GetToken --> SaveToken : [token obtido]
+    SaveToken --> [*] : [token salvo no Firestore]
+}
+
+NotificationInitialState --> FCMSetup : SetupFcmRequested(uid)
+FCMSetup --> NotificationInitialState : [setup completo]
+FCMSetup --> NotificationErrorState : [erro no setup]
+
+' ================== NOTES ==================
+note right of NotificationInitialState
+  Estado padrão.
+  Aguarda requisição de
+  envio de notificação.
+end note
+
+note right of NotificationSendingState
+  Chamando Cloud Function
+  que envia FCM para todos
+  os membros da família.
+end note
+
+note right of NotificationSuccessState
+  Notificação enviada.
+  UI deve exibir feedback
+  e voltar ao Initial.
+end note
+
+note left of NotificationErrorState
+  Erros possíveis:
+  - Sem conexão
+  - Cloud Function falhou
+  - Tokens inválidos
+end note
+
+note bottom of FCMSetup
+  Executado uma vez
+  após login bem-sucedido.
+  Salva token FCM no
+  documento do usuário.
+end note
+
+@enduml

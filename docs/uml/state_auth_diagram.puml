@@ -1,0 +1,84 @@
+@startuml AuthBloc_StateDiagram
+!theme plain
+skinparam state {
+    BackgroundColor<<initial>> LightGray
+    BackgroundColor<<loading>> LightYellow
+    BackgroundColor<<success>> LightGreen
+    BackgroundColor<<error>> LightCoral
+}
+
+title Diagrama de Estado - AuthBloc
+footer PetKeeper Lite - Autenticação
+
+[*] --> AuthUnknownState : App iniciado
+
+state AuthUnknownState <<initial>> {
+    state "Estado Inicial" as unknown_desc
+}
+
+state AuthLoadingState <<loading>> {
+    state "Verificando credenciais..." as loading_desc
+}
+
+state AuthAuthenticatedState <<success>> {
+    state "user: UserEntity" as auth_user
+    state "hasFamily: bool" as auth_family
+}
+
+state AuthUnauthenticatedState <<error>> {
+    state "error: String?" as unauth_error
+}
+
+' ================== TRANSITIONS ==================
+
+' From Unknown
+AuthUnknownState --> AuthLoadingState : AuthCheckRequested
+AuthUnknownState --> AuthLoadingState : SignInRequested
+AuthUnknownState --> AuthLoadingState : SignUpRequested
+
+' From Loading
+AuthLoadingState --> AuthAuthenticatedState : [credenciais válidas]\n/ setupFcmToken()
+AuthLoadingState --> AuthUnauthenticatedState : [credenciais inválidas]\n/ error = "mensagem"
+AuthLoadingState --> AuthUnauthenticatedState : [usuário não encontrado]
+
+' From Authenticated
+AuthAuthenticatedState --> AuthLoadingState : SignOutRequested
+AuthAuthenticatedState --> AuthAuthenticatedState : UserUpdated\n/ user = newUser
+AuthAuthenticatedState --> AuthLoadingState : RefreshUserRequested
+
+' From Unauthenticated
+AuthUnauthenticatedState --> AuthLoadingState : SignInWithEmailRequested\n(email, password)
+AuthUnauthenticatedState --> AuthLoadingState : SignInWithGoogleRequested
+AuthUnauthenticatedState --> AuthLoadingState : SignUpWithEmailRequested\n(email, password, name)
+
+' After SignOut
+AuthLoadingState --> AuthUnauthenticatedState : SignOutCompleted
+
+' ================== NOTES ==================
+note right of AuthUnknownState
+  Estado inicial do app.
+  Ainda não verificou se
+  há sessão ativa.
+end note
+
+note right of AuthAuthenticatedState
+  Usuário logado com sucesso.
+  Token FCM configurado.
+  Pode ou não ter familyCode.
+end note
+
+note left of AuthUnauthenticatedState
+  Usuário não autenticado.
+  Pode conter mensagem de
+  erro da última tentativa.
+end note
+
+note bottom of AuthLoadingState
+  Estado transitório durante:
+  - Login (email/Google)
+  - Cadastro
+  - Logout
+  - Verificação inicial
+end note
+
+@enduml

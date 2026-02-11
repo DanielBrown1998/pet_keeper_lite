@@ -7,18 +7,12 @@ import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 // Sources
-import '../../data/sources/auth_source.dart';
-import '../../data/sources/auth_source_impl.dart';
-import '../../data/sources/family_source.dart';
-import '../../data/sources/family_source_impl.dart';
-import '../../data/sources/google_auth_source.dart';
-import '../../data/sources/google_auth_source_impl.dart';
-import '../../data/sources/notification_source.dart';
-import '../../data/sources/notification_source_impl.dart';
-import '../../data/sources/pet_source.dart';
-import '../../data/sources/pet_source_impl.dart';
-import '../../data/sources/task_source.dart';
-import '../../data/sources/task_source_impl.dart';
+import '../../data/sources/auth_remote_data_source.dart';
+import '../../data/sources/family_remote_data_source.dart';
+import '../../data/sources/google_auth_remote_data_source.dart';
+import '../../data/sources/notification_remote_data_source.dart';
+import '../../data/sources/pet_remote_data_source.dart';
+import '../../data/sources/task_remote_data_source.dart';
 
 // Repositories
 import '../../data/repositories/auth_repository_impl.dart';
@@ -87,37 +81,39 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<FirebaseFunctions>(
     () => FirebaseFunctions.instanceFor(region: 'us-central1'),
   );
-  getIt.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn());
+  getIt.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn(
+     serverClientId: '341762936537-bufbh7l4ca8lqaml7rttme0egnu40gq2.apps.googleusercontent.com'
+  ));
 
   // ===== Sources =====
-  getIt.registerLazySingleton<AuthSource>(
-    () => AuthSourceImpl(
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(
       firebaseAuth: getIt<FirebaseAuth>(),
       firestore: getIt<FirebaseFirestore>(),
     ),
   );
 
-  getIt.registerLazySingleton<GoogleAuthSource>(
-    () => GoogleAuthSourceImpl(googleSignIn: getIt<GoogleSignIn>()),
+  getIt.registerLazySingleton<GoogleAuthRemoteDataSource>(
+    () => GoogleAuthRemoteDataSourceImpl(googleSignIn: getIt<GoogleSignIn>()),
   );
 
-  getIt.registerLazySingleton<PetSource>(
-    () => PetSourceImpl(
+  getIt.registerLazySingleton<PetRemoteDataSource>(
+    () => PetRemoteDataSourceImpl(
       firestore: getIt<FirebaseFirestore>(),
       storage: getIt<FirebaseStorage>(),
     ),
   );
 
-  getIt.registerLazySingleton<TaskSource>(
-    () => TaskSourceImpl(firestore: getIt<FirebaseFirestore>()),
+  getIt.registerLazySingleton<TaskRemoteDataSource>(
+    () => TaskRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
   );
 
-  getIt.registerLazySingleton<FamilySource>(
-    () => FamilySourceImpl(firestore: getIt<FirebaseFirestore>()),
+  getIt.registerLazySingleton<FamilyRemoteDataSource>(
+    () => FamilyRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
   );
 
-  getIt.registerLazySingleton<NotificationSource>(
-    () => NotificationSourceImpl(
+  getIt.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(
       messaging: getIt<FirebaseMessaging>(),
       functions: getIt<FirebaseFunctions>(),
     ),
@@ -126,29 +122,30 @@ Future<void> configureDependencies() async {
   // ===== Repositories =====
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
-      authSource: getIt<AuthSource>(),
-      googleAuthSource: getIt<GoogleAuthSource>(),
+      authRemoteDataSource: getIt<AuthRemoteDataSource>(),
+      googleAuthRemoteDataSource: getIt<GoogleAuthRemoteDataSource>(),
     ),
   );
 
   getIt.registerLazySingleton<PetRepository>(
-    () => PetRepositoryImpl(petSource: getIt<PetSource>()),
+    () => PetRepositoryImpl(petRemoteDataSource: getIt<PetRemoteDataSource>()),
   );
 
   getIt.registerLazySingleton<TaskRepository>(
-    () => TaskRepositoryImpl(taskSource: getIt<TaskSource>()),
+    () =>
+        TaskRepositoryImpl(taskRemoteDataSource: getIt<TaskRemoteDataSource>()),
   );
 
   getIt.registerLazySingleton<FamilyRepository>(
     () => FamilyRepositoryImpl(
-      familySource: getIt<FamilySource>(),
-      authSource: getIt<AuthSource>(),
+      familyRemoteDataSource: getIt<FamilyRemoteDataSource>(),
+      authRemoteDataSource: getIt<AuthRemoteDataSource>(),
     ),
   );
 
   getIt.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(
-      notificationSource: getIt<NotificationSource>(),
+      notificationRemoteDataSource: getIt<NotificationRemoteDataSource>(),
     ),
   );
 

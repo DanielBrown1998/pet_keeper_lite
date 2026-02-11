@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class PetNotifyDialog extends StatefulWidget {
+class NotifyFamilyDialog extends StatefulWidget {
   final String petName;
   final void Function(String message) onSend;
   final VoidCallback onCancel;
 
-  const PetNotifyDialog({
+  const NotifyFamilyDialog({
     super.key,
     required this.petName,
     required this.onSend,
@@ -13,10 +13,10 @@ class PetNotifyDialog extends StatefulWidget {
   });
 
   @override
-  State<PetNotifyDialog> createState() => _PetNotifyDialogState();
+  State<NotifyFamilyDialog> createState() => _NotifyFamilyDialogState();
 }
 
-class _PetNotifyDialogState extends State<PetNotifyDialog> {
+class _NotifyFamilyDialogState extends State<NotifyFamilyDialog> {
   final _messageController = TextEditingController();
 
   @override

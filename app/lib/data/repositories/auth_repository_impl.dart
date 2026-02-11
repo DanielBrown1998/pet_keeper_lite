@@ -5,25 +5,25 @@ import '../../core/error/failures.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/user_model.dart';
-import '../sources/auth_source.dart';
-import '../sources/google_auth_source.dart';
+import '../sources/auth_remote_data_source.dart';
+import '../sources/google_auth_remote_data_source.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthSource _authSource;
-  final GoogleAuthSource _googleAuthSource;
+  final AuthRemoteDataSource _authRemoteDataSource;
+  final GoogleAuthRemoteDataSource _googleAuthRemoteDataSource;
 
   AuthRepositoryImpl({
-    required AuthSource authSource,
-    required GoogleAuthSource googleAuthSource,
-  }) : _authSource = authSource,
-       _googleAuthSource = googleAuthSource;
+    required AuthRemoteDataSource authRemoteDataSource,
+    required GoogleAuthRemoteDataSource googleAuthRemoteDataSource,
+  }) : _authRemoteDataSource = authRemoteDataSource,
+       _googleAuthRemoteDataSource = googleAuthRemoteDataSource;
 
   @override
   Stream<UserEntity?> get authStateChanges {
-    return _authSource.authStateChanges.asyncMap((user) async {
+    return _authRemoteDataSource.authStateChanges.asyncMap((user) async {
       if (user == null) return null;
       try {
-        final userData = await _authSource.getUserData(user.uid);
+        final userData = await _authRemoteDataSource.getUserData(user.uid);
         if (userData != null) {
           return userData;
         }
@@ -44,10 +44,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> get currentUser async {
-    final user = _authSource.currentUser;
+    final user = _authRemoteDataSource.currentUser;
     if (user == null) return null;
     try {
-      final userData = await _authSource.getUserData(user.uid);
+      final userData = await _authRemoteDataSource.getUserData(user.uid);
       if (userData != null) {
         return userData;
       }
@@ -71,7 +71,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final credential = await _authSource.signInWithEmailAndPassword(
+      final credential = await _authRemoteDataSource.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -80,7 +80,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return const Left(AuthFailure('Falha ao fazer login'));
       }
 
-      final userData = await _authSource.getUserData(user.uid);
+      final userData = await _authRemoteDataSource.getUserData(user.uid);
       if (userData != null) {
         return Right(userData);
       }
@@ -105,7 +105,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? displayName,
   }) async {
     try {
-      final credential = await _authSource.signUpWithEmailAndPassword(
+      final credential = await _authRemoteDataSource.signUpWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -115,7 +115,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       if (displayName != null) {
-        await _authSource.updateDisplayName(displayName);
+        await _authRemoteDataSource.updateDisplayName(displayName);
       }
 
       final userModel = UserModel(
@@ -124,7 +124,7 @@ class AuthRepositoryImpl implements AuthRepository {
         displayName: displayName,
       );
 
-      await _authSource.saveUserData(userModel);
+      await _authRemoteDataSource.saveUserData(userModel);
 
       return Right(userModel);
     } on FirebaseAuthException catch (e) {
@@ -137,18 +137,20 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserEntity>> signInWithGoogle() async {
     try {
-      final credential = await _googleAuthSource.signIn();
+      final credential = await _googleAuthRemoteDataSource.signIn();
       if (credential == null) {
         return const Left(AuthFailure('Login com Google cancelado'));
       }
 
-      final userCredential = await _authSource.signInWithCredential(credential);
+      final userCredential = await _authRemoteDataSource.signInWithCredential(
+        credential,
+      );
       final user = userCredential.user;
       if (user == null) {
         return const Left(AuthFailure('Falha ao fazer login com Google'));
       }
 
-      final userData = await _authSource.getUserData(user.uid);
+      final userData = await _authRemoteDataSource.getUserData(user.uid);
       if (userData != null) {
         return Right(userData);
       }
@@ -159,7 +161,7 @@ class AuthRepositoryImpl implements AuthRepository {
         displayName: user.displayName,
       );
 
-      await _authSource.saveUserData(userModel);
+      await _authRemoteDataSource.saveUserData(userModel);
 
       return Right(userModel);
     } catch (e) {
@@ -170,7 +172,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> signOut() async {
     try {
-      await Future.wait([_authSource.signOut(), _googleAuthSource.signOut()]);
+      await Future.wait([
+        _authRemoteDataSource.signOut(),
+        _googleAuthRemoteDataSource.signOut(),
+      ]);
       return const Right(null);
     } catch (e) {
       return Left(AuthFailure(e.toString()));
@@ -183,7 +188,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? familyCode,
   }) async {
     try {
-      final user = _authSource.currentUser;
+      final user = _authRemoteDataSource.currentUser;
       if (user == null) {
         return const Left(AuthFailure('Usuário não autenticado'));
       }
@@ -191,14 +196,14 @@ class AuthRepositoryImpl implements AuthRepository {
       final updates = <String, dynamic>{};
       if (displayName != null) {
         updates['displayName'] = displayName;
-        await _authSource.updateDisplayName(displayName);
+        await _authRemoteDataSource.updateDisplayName(displayName);
       }
       if (familyCode != null) {
         updates['familyCode'] = familyCode;
       }
 
       if (updates.isNotEmpty) {
-        await _authSource.updateUserProfile(user.uid, updates);
+        await _authRemoteDataSource.updateUserProfile(user.uid, updates);
       }
 
       return const Right(null);
@@ -210,12 +215,12 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> updateFcmToken(String token) async {
     try {
-      final user = _authSource.currentUser;
+      final user = _authRemoteDataSource.currentUser;
       if (user == null) {
         return const Left(AuthFailure('Usuário não autenticado'));
       }
 
-      await _authSource.addFcmToken(user.uid, token);
+      await _authRemoteDataSource.addFcmToken(user.uid, token);
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -225,7 +230,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserEntity>> getUserData(String uid) async {
     try {
-      final userData = await _authSource.getUserData(uid);
+      final userData = await _authRemoteDataSource.getUserData(uid);
       if (userData == null) {
         return const Left(ServerFailure('Usuário não encontrado'));
       }

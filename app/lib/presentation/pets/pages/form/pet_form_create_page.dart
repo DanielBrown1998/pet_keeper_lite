@@ -7,56 +7,28 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../domain/entities/pet_entity.dart';
-import '../../../domain/entities/pet_species.dart';
-import '../../auth/bloc/auth_bloc.dart';
-import '../../common/widgets/camera_dialog.dart';
-import '../bloc/pet_bloc.dart';
-import '../bloc/pet_event.dart';
-import '../bloc/pet_state.dart';
+import '../../../../domain/entities/pet_entity.dart';
+import '../../../../core/helpers/pet_species.dart';
+import '../../../auth/bloc/auth_bloc.dart';
+import '../../../common/widgets/camera_dialog.dart';
+import '../../bloc/pet_bloc.dart';
+import '../../bloc/pet_event.dart';
+import '../../bloc/pet_state.dart';
 
-class PetFormPage extends StatefulWidget {
-  final String? petId;
-
-  const PetFormPage({super.key, this.petId});
+class PetFormCreatePage extends StatefulWidget {
+  const PetFormCreatePage({super.key});
 
   @override
-  State<PetFormPage> createState() => _PetFormPageState();
+  State<PetFormCreatePage> createState() => _PetFormCreatePageState();
 }
 
-class _PetFormPageState extends State<PetFormPage> {
+class _PetFormCreatePageState extends State<PetFormCreatePage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _weightController = TextEditingController();
   DateTime? _birthDate;
   PetSpecies _selectedSpecies = PetSpecies.dog;
   File? _photo;
-  PetEntity? _existingPet;
-
-  bool get isEditing => widget.petId != null;
-
-  void _loadPet() {
-    final petBloc = context.read<PetBloc>();
-    final pet = petBloc.state.pets
-        .where((p) => p.id == widget.petId)
-        .firstOrNull;
-    if (pet != null) {
-      _existingPet = pet;
-      _nameController.text = pet.name;
-      _weightController.text = pet.weightKg?.toString() ?? '';
-      _birthDate = pet.birthDate;
-      _selectedSpecies = PetSpecies.fromValue(pet.species);
-      setState(() {});
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (isEditing) {
-      _loadPet();
-    }
-  }
 
   @override
   void dispose() {
@@ -139,9 +111,9 @@ class _PetFormPageState extends State<PetFormPage> {
         );
         return;
       }
-      final petBloc = context.read<PetBloc>();
+
       final pet = PetEntity(
-        id: widget.petId ?? const Uuid().v4(),
+        id: const Uuid().v4(),
         familyCode: familyCode,
         name: _nameController.text.trim(),
         species: _selectedSpecies.value,
@@ -149,22 +121,18 @@ class _PetFormPageState extends State<PetFormPage> {
         weightKg: _weightController.text.isNotEmpty
             ? double.tryParse(_weightController.text)
             : null,
-        photoUrl: _existingPet?.photoUrl,
-        createdAt: _existingPet?.createdAt ?? DateTime.now(),
+        photoUrl: null,
+        createdAt: DateTime.now(),
       );
 
-      if (isEditing) {
-        petBloc.add(PetUpdateRequested(pet: pet, photo: _photo));
-      } else {
-        petBloc.add(PetCreateRequested(pet: pet, photo: _photo));
-      }
+      context.read<PetBloc>().add(PetCreateRequested(pet: pet, photo: _photo));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Editar Pet' : 'Adicionar Pet')),
+      appBar: AppBar(title: const Text('Adicionar Pet')),
       body: BlocConsumer<PetBloc, PetState>(
         listener: (context, state) {
           if (state.successMessage != null) {
@@ -201,13 +169,8 @@ class _PetFormPageState extends State<PetFormPage> {
                               backgroundColor: Colors.grey[200],
                               backgroundImage: _photo != null
                                   ? FileImage(_photo!)
-                                  : (_existingPet?.photoUrl != null
-                                        ? NetworkImage(_existingPet!.photoUrl!)
-                                              as ImageProvider
-                                        : null),
-                              child:
-                                  (_photo == null &&
-                                      _existingPet?.photoUrl == null)
+                                  : null,
+                              child: _photo == null
                                   ? const Icon(
                                       Icons.pets,
                                       size: 50,
@@ -343,9 +306,9 @@ class _PetFormPageState extends State<PetFormPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : Text(
-                              isEditing ? 'Salvar Alterações' : 'Adicionar Pet',
-                              style: const TextStyle(fontSize: 16),
+                          : const Text(
+                              'Adicionar Pet',
+                              style: TextStyle(fontSize: 16),
                             ),
                     ),
                   ],

@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../domain/entities/pet_species.dart';
+import '../../../core/helpers/pet_species.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
@@ -64,13 +65,31 @@ class _PetsListView extends StatelessWidget {
         actions: [
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
+              final familyCode = state.user?.familyCode ?? '';
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Chip(
-                  avatar: const Icon(Icons.family_restroom, size: 16),
-                  label: Text(
-                    state.user?.familyCode ?? '',
-                    style: const TextStyle(fontSize: 12),
+                child: Tooltip(
+                  message: 'Toque para copiar',
+                  child: ActionChip(
+                    avatar: const Icon(Icons.family_restroom, size: 16),
+                    label: Text(
+                      familyCode,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    onPressed: familyCode.isNotEmpty
+                        ? () async {
+                            await FlutterClipboard.copy(familyCode);
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Código da família "$familyCode" copiado!',
+                                ),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        : null,
                   ),
                 ),
               );
@@ -177,7 +196,7 @@ class _PetsListView extends StatelessWidget {
                               : Container(
                                   color: Colors.grey[200],
                                   child: Icon(
-                                    _getSpeciesIcon(pet.species),
+                                    PetSpecies.fromValue(pet.species).icon,
                                     size: 40,
                                     color: Colors.grey[600],
                                   ),
@@ -198,7 +217,7 @@ class _PetsListView extends StatelessWidget {
                                 Row(
                                   children: [
                                     Icon(
-                                      _getSpeciesIcon(pet.species),
+                                      PetSpecies.fromValue(pet.species).icon,
                                       size: 16,
                                       color: Colors.grey[600],
                                     ),
@@ -241,20 +260,5 @@ class _PetsListView extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
     );
-  }
-
-  IconData _getSpeciesIcon(String species) {
-    switch (species.toLowerCase()) {
-      case 'dog':
-        return Icons.pets;
-      case 'cat':
-        return Icons.pets;
-      case 'bird':
-        return Icons.flutter_dash;
-      case 'fish':
-        return Icons.water;
-      default:
-        return Icons.pets;
-    }
   }
 }

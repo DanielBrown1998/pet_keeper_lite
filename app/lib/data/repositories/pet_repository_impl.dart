@@ -6,16 +6,17 @@ import '../../core/error/failures.dart';
 import '../../domain/entities/pet_entity.dart';
 import '../../domain/repositories/pet_repository.dart';
 import '../models/pet_model.dart';
-import '../sources/pet_source.dart';
+import '../sources/pet_remote_data_source.dart';
 
 class PetRepositoryImpl implements PetRepository {
-  final PetSource _petSource;
+  final PetRemoteDataSource _petRemoteDataSource;
 
-  PetRepositoryImpl({required PetSource petSource}) : _petSource = petSource;
+  PetRepositoryImpl({required PetRemoteDataSource petRemoteDataSource})
+    : _petRemoteDataSource = petRemoteDataSource;
 
   @override
   Stream<List<PetEntity>> watchPets(String familyCode) {
-    return _petSource
+    return _petRemoteDataSource
         .watchPets(familyCode)
         .map((models) => models.map((model) => model as PetEntity).toList());
   }
@@ -23,7 +24,7 @@ class PetRepositoryImpl implements PetRepository {
   @override
   Future<Either<Failure, PetEntity>> getPet(String petId) async {
     try {
-      final pet = await _petSource.getPet(petId);
+      final pet = await _petRemoteDataSource.getPet(petId);
       if (pet == null) {
         return const Left(ServerFailure('Pet não encontrado'));
       }
@@ -37,7 +38,7 @@ class PetRepositoryImpl implements PetRepository {
   Future<Either<Failure, PetEntity>> createPet(PetEntity pet) async {
     try {
       final petModel = PetModel.fromEntity(pet);
-      await _petSource.createPet(petModel);
+      await _petRemoteDataSource.createPet(petModel);
       return Right(petModel);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -48,7 +49,7 @@ class PetRepositoryImpl implements PetRepository {
   Future<Either<Failure, PetEntity>> updatePet(PetEntity pet) async {
     try {
       final petModel = PetModel.fromEntity(pet);
-      await _petSource.updatePet(petModel);
+      await _petRemoteDataSource.updatePet(petModel);
       return Right(petModel);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -58,9 +59,9 @@ class PetRepositoryImpl implements PetRepository {
   @override
   Future<Either<Failure, void>> deletePet(String petId) async {
     try {
-      await _petSource.deletePet(petId);
-      await _petSource.deletePhoto(petId);
-      await _petSource.deleteTasksForPet(petId);
+      await _petRemoteDataSource.deletePet(petId);
+      await _petRemoteDataSource.deletePhoto(petId);
+      await _petRemoteDataSource.deleteTasksForPet(petId);
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -73,7 +74,7 @@ class PetRepositoryImpl implements PetRepository {
     File photo,
   ) async {
     try {
-      final url = await _petSource.uploadPhoto(petId, photo);
+      final url = await _petRemoteDataSource.uploadPhoto(petId, photo);
       return Right(url);
     } catch (e) {
       return Left(StorageFailure(e.toString()));

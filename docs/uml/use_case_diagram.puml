@@ -1,0 +1,162 @@
+@startuml PetKeeperLite_UseCaseDiagram
+!theme plain
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+title Diagrama de Casos de Uso - PetKeeper Lite
+footer UML 2.0
+
+' ================== ACTORS ==================
+actor "Usuário\n(Não Autenticado)" as Guest #LightGray
+actor "Membro da Família\n(Autenticado)" as Member #LightBlue
+actor "Firebase" as Firebase <<system>> #Orange
+
+' Herança de atores
+Guest <|-- Member
+
+' ================== SYSTEM BOUNDARY ==================
+rectangle "PetKeeper Lite" {
+    
+    ' ================== AUTH PACKAGE ==================
+    package "Autenticação" #E8F5E9 {
+        usecase "UC-001\nFazer Login com\nEmail/Senha" as UC001
+        usecase "UC-002\nFazer Login com\nGoogle" as UC002
+        usecase "UC-003\nCriar Conta" as UC003
+        usecase "UC-004\nFazer Logout" as UC004
+        usecase "UC-005\nVerificar\nAutenticação" as UC005
+        
+        usecase "Validar\nCredenciais" as ValidateCredentials <<extend>>
+        usecase "Configurar\nToken FCM" as SetupFCM <<include>>
+    }
+    
+    ' ================== FAMILY PACKAGE ==================
+    package "Família" #E3F2FD {
+        usecase "UC-006\nCriar Família" as UC006
+        usecase "UC-007\nEntrar em Família\nExistente" as UC007
+        usecase "UC-008\nVerificar se Família\nExiste" as UC008
+        
+        usecase "Gerar Código\nde Família" as GenerateCode <<include>>
+        usecase "Validar Código\nde Família" as ValidateCode <<include>>
+    }
+    
+    ' ================== PETS PACKAGE ==================
+    package "Pets" #FFF3E0 {
+        usecase "UC-009\nListar Pets\nda Família" as UC009
+        usecase "UC-010\nCadastrar Pet" as UC010
+        usecase "UC-011\nEditar Pet" as UC011
+        usecase "UC-012\nExcluir Pet" as UC012
+        usecase "UC-013\nUpload de Foto\ndo Pet" as UC013
+        
+        usecase "Sincronizar\nem Tempo Real" as SyncRealtime <<include>>
+        usecase "Validar Dados\ndo Pet" as ValidatePet <<extend>>
+    }
+    
+    ' ================== TASKS PACKAGE ==================
+    package "Tarefas/Vacinas" #F3E5F5 {
+        usecase "UC-014\nListar Tarefas\ndo Pet" as UC014
+        usecase "UC-015\nCriar Tarefa/Vacina" as UC015
+        usecase "UC-016\nEditar Tarefa" as UC016
+        usecase "UC-017\nMarcar Tarefa\ncomo Concluída" as UC017
+        usecase "UC-018\nExcluir Tarefa" as UC018
+        
+        usecase "Filtrar por\nTipo de Tarefa" as FilterTasks <<extend>>
+    }
+    
+    ' ================== NOTIFICATION PACKAGE ==================
+    package "Notificações" #FFEBEE {
+        usecase "UC-019\nAvisar Família\n(Push Notification)" as UC019
+        usecase "UC-020\nSolicitar Permissão\nde Notificação" as UC020
+        
+        usecase "Enviar via\nFCM" as SendFCM <<include>>
+    }
+}
+
+' ================== GUEST ASSOCIATIONS ==================
+Guest --> UC001
+Guest --> UC002
+Guest --> UC003
+
+' ================== MEMBER ASSOCIATIONS ==================
+Member --> UC004
+Member --> UC005
+Member --> UC006
+Member --> UC007
+Member --> UC008
+Member --> UC009
+Member --> UC010
+Member --> UC011
+Member --> UC012
+Member --> UC013
+Member --> UC014
+Member --> UC015
+Member --> UC016
+Member --> UC017
+Member --> UC018
+Member --> UC019
+Member --> UC020
+
+' ================== FIREBASE ASSOCIATIONS ==================
+Firebase --> UC001
+Firebase --> UC002
+Firebase --> UC003
+Firebase --> UC009
+Firebase --> UC014
+Firebase --> UC019
+
+' ================== INCLUDE RELATIONSHIPS ==================
+UC001 ..> ValidateCredentials : <<extend>>
+UC002 ..> SetupFCM : <<include>>
+UC001 ..> SetupFCM : <<include>>
+UC003 ..> SetupFCM : <<include>>
+
+UC006 ..> GenerateCode : <<include>>
+UC007 ..> ValidateCode : <<include>>
+UC008 ..> ValidateCode : <<include>>
+
+UC009 ..> SyncRealtime : <<include>>
+UC010 ..> ValidatePet : <<extend>>
+UC010 ..> UC013 : <<extend>>
+UC011 ..> UC013 : <<extend>>
+UC011 ..> ValidatePet : <<extend>>
+
+UC014 ..> SyncRealtime : <<include>>
+UC014 ..> FilterTasks : <<extend>>
+
+UC019 ..> SendFCM : <<include>>
+
+' ================== NOTES ==================
+note right of UC001
+  **Pré-condições:**
+  - Email e senha válidos
+  - Conta existente
+end note
+
+note right of UC006
+  **Pós-condições:**
+  - Código único de 6 caracteres gerado
+  - Usuário associado à família
+end note
+
+note right of UC009
+  **Regra de Negócio:**
+  - Apenas pets do mesmo
+    familyCode são exibidos
+end note
+
+note right of UC019
+  **Regra de Negócio:**
+  - Notifica todos os membros
+    da família via FCM
+end note
+
+note bottom of Firebase
+  **Sistema Externo:**
+  - Firebase Auth
+  - Firestore
+  - Storage
+  - Cloud Functions
+  - FCM
+end note
+
+@enduml

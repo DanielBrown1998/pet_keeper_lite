@@ -50,27 +50,6 @@ const bool useEmulators = false;
 /// Run 'ipconfig' (Windows) or 'ifconfig' (Mac/Linux) to find it
 const String localMachineIp = '192.168.1.5';
 
-/// Configure Firebase to use local emulators
-Future<void> _configureEmulators() async {
-  // For physical Android devices, use your machine's local IP
-  // For Android emulator, use 10.0.2.2
-  // For iOS simulator or desktop, use localhost
-  String emulatorHost;
-
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    // Use local IP for physical devices (works for both emulator and physical)
-    emulatorHost = localMachineIp;
-  } else {
-    emulatorHost = 'localhost';
-  }
-
-  await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
-  FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
-  await FirebaseStorage.instance.useStorageEmulator(emulatorHost, 9199);
-
-  debugPrint('🔧 Using Firebase emulators at $emulatorHost');
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -244,4 +223,25 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+/// Configure Firebase to use local emulators
+Future<void> _configureEmulators() async {
+  // For physical Android devices, use your machine's local IP
+  // For Android emulator, use 10.0.2.2
+  // For iOS simulator or desktop, use localhost
+  String emulatorHost;
+
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    // Use local IP for physical devices (works for both emulator and physical)
+    emulatorHost = localMachineIp;
+  } else {
+    emulatorHost = 'localhost';
+  }
+
+  await FirebaseAuth.instance.useAuthEmulator(emulatorHost, 9099);
+  FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
+  await FirebaseStorage.instance.useStorageEmulator(emulatorHost, 9199);
+
+  debugPrint('🔧 Using Firebase emulators at $emulatorHost');
 }

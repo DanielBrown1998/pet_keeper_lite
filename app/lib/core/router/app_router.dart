@@ -6,7 +6,7 @@ import '../../presentation/auth/pages/login_page.dart';
 import '../../presentation/auth/pages/register_page.dart';
 import '../../presentation/family/pages/family_setup_page.dart';
 import '../../presentation/pets/pages/pet_detail_page.dart';
-import '../../presentation/pets/pages/pet_form_page.dart';
+import '../../presentation/pets/pages/form/pet_form_page.dart';
 import '../../presentation/pets/pages/pets_list_page.dart';
 import '../../presentation/tasks/pages/task_form_page.dart';
 

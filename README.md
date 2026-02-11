@@ -1,8 +1,8 @@
-# PetKeeper Lite 🐾
+# PetKeeper Lite
 
 App consumidor para cadastro compartilhado de pets e controle básico de vacinas/tarefas, com foto e sincronização em tempo real.
 
-## 📱 Funcionalidades
+## Funcionalidades
 
 - **Autenticação**: Firebase Auth (email/senha + Google Sign-In)
 - **Pets (Firestore)**: CRUD completo de pets (nome, espécie, data de nascimento, peso)
@@ -12,7 +12,7 @@ App consumidor para cadastro compartilhado de pets e controle básico de vacinas
 - **Notificação push (FCM)**: Botão "Avisar família" envia push para todos os membros
 - **Sync em tempo real**: Listas atualizadas ao vivo via Firestore Streams
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 O projeto utiliza **Clean Architecture** com as seguintes camadas:
 
@@ -21,31 +21,53 @@ lib/
 ├── core/
 │   ├── di/                 # Injeção de dependências (GetIt)
 │   ├── error/              # Failures e Exceptions
-│   ├── router/             # Go_Router configuration
+│   ├── helpers/            # Funções auxiliares
+│   ├── router/             # Configuração do GoRouter
 │   └── usecases/           # UseCase base class
 ├── data/
 │   ├── models/             # Models com conversão Firestore
-│   └── repositories/       # Implementações dos repositórios
+│   ├── repositories/       # Implementações dos repositórios
+│   └── sources/            # Contratos e implementações de acesso ao Firebase
 ├── domain/
 │   ├── entities/           # Entidades de negócio
-│   └── repositories/       # Contratos abstratos
+│   ├── repositories/       # Contratos abstratos
+│   └── usecases/           # Casos de uso da aplicação
 └── presentation/
     ├── auth/               # Login, Registro (Bloc)
+    ├── common/             # Widgets compartilhados
     ├── family/             # Onboarding família (Bloc)
+    ├── notification/       # Notificações push (Bloc)
     ├── pets/               # CRUD de pets (Bloc)
     └── tasks/              # Vacinas/Tarefas (Bloc)
 ```
 
-### Tecnologias utilizadas:
+### Tecnologias Utilizadas
 
 - **Flutter 3.x** com Dart
-- **Bloc/Cubit** para gerenciamento de estado
-- **Go_Router** para navegação declarativa
+- **Bloc** para gerenciamento de estado
+- **GoRouter** para navegação declarativa
 - **GetIt** para injeção de dependências
 - **Firebase**: Auth, Firestore, Storage, Functions, Messaging
-- **Dartz** para programação funcional (Either<Failure, Success>)
+- **Dartz** para programação funcional (`Either<Failure, Success>`)
 
-## 🚀 Setup do Projeto
+### Trade-offs das Escolhas Tecnológicas
+
+**Firebase é requisito do projeto, portanto trade-offs não foram realizados quanto ao back-end
+
+| Tecnologia | Vantagens | Desvantagens | Alternativas Consideradas |
+|------------|-----------|--------------|---------------------------|
+| **Bloc** | Separação clara de lógica e UI; testabilidade alta; padrão previsível com eventos/estados; suporte a streams | Mais boilerplate que outras soluções; curva de aprendizado inicial | Provider|
+| **GoRouter** | Navegação declarativa; deep linking nativo; integração com `go_router_builder` para type-safety; redirecionamentos fáceis | Menos flexível para navegação imperativa complexa; documentação às vezes desatualizada | Navigator 2.0 puro, AutoRoute |
+| **GetIt** | Service Locator simples e rápido; lazy initialization; sem dependência de contexto/widget | Não é DI real (não resolve dependências automaticamente); pode virar "God Container" se mal usado | Injectable, Riverpod, Provider |
+| **Dartz** | `Either<L, R>` para tratamento explícito de erros; programação funcional idiomática; elimina exceções não tratadas | Sintaxe verbosa; curva de aprendizado para quem não conhece FP; biblioteca não mais mantida ativamente | fpdart, result_dart, Result pattern manual |
+
+> **Decisão geral**: Priorizei **previsibilidade** e **testabilidade** sobre simplicidade inicial. O custo de boilerplate do Bloc compensa em projetos médios/grandes onde debugging e manutenção são críticos.
+
+## Apresentação do Projeto
+
+[Link para apresentação](https://drive.google.com/drive/folders/1ZyJ54CWpaur7nLk3eI5E-5j0XmPBEk8-?usp=sharing)
+
+## Setup do Projeto
 
 ### Pré-requisitos
 
@@ -141,16 +163,20 @@ cd app
 flutter run
 ```
 
-**Nota**: Para usar emuladores, adicione no `main.dart`:
+**Nota**: Para usar emuladores, altere a flag no `main.dart`:
 
 ```dart
-// Adicionar após Firebase.initializeApp()
-if (kDebugMode) {
-  await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-  FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
-}
+/// Set to true to use Firebase emulators
+const bool useEmulators = true;
+
+/// Your local machine IP address (for physical devices)
+/// Run 'ipconfig' (Windows) or 'ifconfig' (Mac/Linux) to find it
+const String localMachineIp = 'your address IPv4';
 ```
+
+A configuração dos emuladores é feita automaticamente com base na plataforma:
+- **Android físico**: usa `localMachineIp`
+- **iOS Simulator / Desktop**: usa `localhost`
 
 ## 📱 Executando o App
 
@@ -167,7 +193,7 @@ flutter run -d ios
 flutter run
 ```
 
-## 🔔 Configurando Push Notifications
+## Configurando Push Notifications
 
 ### Android
 
@@ -179,7 +205,7 @@ O FCM já está configurado. Certifique-se de ter o `google-services.json`.
 2. Faça upload da chave APNs no Firebase Console
 3. Adicione capabilities no Xcode: Push Notifications e Background Modes
 
-## 📋 Estrutura de Dados
+## Estrutura de Dados
 
 ### Firestore Collections
 
@@ -214,7 +240,7 @@ pet_tasks/{taskId}
 └── done: boolean
 ```
 
-## 🔐 Segurança
+## Segurança
 
 ### Firestore Rules
 
@@ -228,43 +254,52 @@ pet_tasks/{taskId}
 - Apenas imagens aceitas
 - Requer autenticação
 
-### Melhorias futuras sugeridas:
+### Melhorias Futuras Sugeridas
 
-- Custom Claims para validação server-side do familyCode
+- Custom Claims para validação server-side do `familyCode`
 - Rules mais estritas em `pet_tasks` validando ownership do pet
 - Rate limiting nas Cloud Functions
 
-## 🎬 Fluxos de UX
+## Fluxos de UX
 
 1. **Onboarding** → Criar ou entrar com `familyCode`
 2. **Lista de Pets** → Stream em tempo real
 3. **Detalhe do Pet** → Ver info + CRUD de vacinas/tarefas
 4. **Avisar Família** → Push notification para todos os membros
 
-## 🧪 Testes
+## Testes
+
+O projeto inclui testes unitários, de Bloc e de Widget organizados na pasta `test/`:
+
+```
+test/
+├── bloc/
+│   └── auth_bloc_test.dart       # Testes do AuthBloc (estados e eventos)
+├── unit/
+│   └── pet_entity_test.dart      # Testes das entidades de domínio
+└── widget/
+    ├── login_page_test.dart      # Testes da tela de login
+    └── pets_list_page_test.dart  # Testes da lista de pets
+```
+
+### Executar Testes
 
 ```bash
 cd app
 
-# Unit tests
+# Executar todos os testes
 flutter test
 
-# Widget tests
-flutter test test/widget_test.dart
+# Executar com cobertura
+flutter test --coverage
 
-# Integration tests
-flutter test integration_test/
+# Executar testes específicos
+flutter test test/bloc/
+flutter test test/unit/
+flutter test test/widget/
 ```
 
-
-### Código refatorado manualmente:
-
-- **Segurança**: Adicionei validações extras nas rules e na Cloud Function
-- **Performance**: Implementei streams ao invés de futures para dados em tempo real
-- **UX**: Adicionei estados de loading, empty e error em todas as telas
-- **Type Safety**: Corrigi tipagens e adicionei null checks onde necessário
-
-## 📹 Vídeo de Demonstração
+## Vídeo de Demonstração
 
 [Link do vídeo aqui - máximo 8 minutos]
 
@@ -275,35 +310,53 @@ Demonstra:
 4. CRUD de vacinas/tarefas em tempo real
 5. Push notification "Avisar Família"
 
-## 📄 Licença
+## Licença
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 
-## 🤖 Como usei o Cursor
+## Como Usei o Cursor
 
-## Prompts utilizados
-1. De acordo com os requisitos prepare um projeto com base no clean code, utilizando o clean architecture, Bloc para gerenciamento de estado, Go_Router para navegacao, GetIt para injecao de dependencia.
+### Prompts Utilizados
 
-2. Voce quebrou alguns principios do SOLID, 
-Bloc contem logica e gerencia o estado (violou o SRP), o RepositoryPattern esta inserido diretamente no Bloc 
-para resolver crie os casos de uso e mova a logica para la, ponha os arquivos do caso de uso no pasta de dominio, 
-aqui voce quebrou o ISP, crie um source (contrato e implementacao para acessar o firebase).   
+#### 1. PROMPT
 
-Repositorios retornan as entidades anemicas
-Source retornam os Models
+De acordo com os requisitos, prepare um projeto com base no Clean Code, utilizando Clean Architecture, Bloc para gerenciamento de estado, GoRouter para navegação e GetIt para injeção de dependência. Apenas estruture-o e insira as dependências necessárias para utilizar FCM, Firebase Auth (OAuth Google e email/senha), Firestore e Storage.
 
-Ademais, voce tambem nao instanciou todos os Blocs no topo da arvore com o BlocProvider, utilize o GetIt apenas para instanciar os sources, repositories e usecases, os BLocs ficarao no topo da arvore, e receberam suas dependencias buscando as intancias no GetIt, (tudo lazy)
+---
 
-A estrutura do dartz vai para o usecase, em caso de erro retorne as falhas ja escritas
+#### 2. PROMPT
 
-### ajuste manual: 
-O agente criou as dependencias no main diretamente, coloquei todos dentro do BlocProvider para tornarem-se lazy e nao prejudicar a inicializacao do app.
+Você quebrou alguns princípios do SOLID:
 
-3.Ok, agora eu tenho mais uma questao, os estados do Bloc estao definidos como const dentro de seus respectivos state, defina uma sealed class e a partir dos tipos AuthUnknowState, AuthLoadingState, AuthAuthenticatedState ... entao ai voce define o status da autenticacao, o usuario se houver e o erro caso haja. 
+- **Bloc contém lógica e gerencia o estado** (violou o SRP)
+- **O Repository Pattern está inserido diretamente no Bloc** (violou o ISP) e chamando o Firestore e outros recursos diretamente (o papel do Repository Pattern é apenas indicar qual source utilizar: remoto ou local)
 
- ### O que foi ajustado
------------------------------ ANTES -----------------------------------:   
+**Para resolver:**
+- Crie os casos de uso listados na documentação presente no contexto e mova a lógica para lá
+- Ponha os arquivos do caso de uso na pasta `domain`
+- Crie também uma pasta `source` em `data` (com contrato e implementação para acessar o Firebase)
+
+**Outro detalhe:**
+- Repositórios retornam as entidades anêmicas
+- Sources retornam os Models
+
+**Ademais**, você também não instanciou todos os Blocs no topo da árvore com o `BlocProvider`. Utilize o GetIt apenas para instanciar os sources, repositories e usecases. Os Blocs ficarão no topo da árvore e receberão suas dependências buscando as instâncias no GetIt (tudo lazy).
+
+> **Ajuste manual:** Apesar das instruções, o agente criou as dependências no `main` diretamente. Coloquei todos dentro do `BlocProvider` para tornarem-se lazy e não prejudicar a inicialização do app. Alguns widgets continham lógica de negócio diretamente na UI; criei novos casos de uso para implementar essa lógica.
+
+---
+
+#### 3. PROMPT
+
+Os estados do Bloc estão definidos com um `enum` dentro de seus respectivos `state`. Defina uma `sealed class` e, a partir dos tipos `AuthUnknownState`, `AuthLoadingState`, `AuthAuthenticatedState`, etc., defina o status da autenticação, o usuário (se houver) e o erro (caso haja).
+
+<details>
+<summary><strong>O que foi ajustado</strong></summary>
+
+**ANTES:**
+
+```dart
 enum AuthStatus { unknown, authenticated, unauthenticated, loading }
 
 class AuthState extends Equatable {
@@ -339,9 +392,11 @@ class AuthState extends Equatable {
   @override
   List<Object?> get props => [status, user, error];
 }
-----------------------------------DEPOIS -----------------------------------|
+```
 
+**DEPOIS:**
 
+```dart
 sealed class AuthState extends Equatable {
   const AuthState();
 
@@ -399,29 +454,71 @@ final class AuthUnauthenticatedState extends AuthState {
   @override
   List<Object?> get props => [error];
 }
+```
 
-4. todos esses widget selecionados, deveriam ser classes de widgets, e nao funcoes, o flutter deve renderizalos e criar seu proprio element na arvore de elementos, do modo como esta o app tera menos performance, entao escreva esses widgets em uma pasta widget dentro de pets/pages/widgets, mova suas dependencias para la tambem (como algum dialog ou codigo sincrono)
+</details>
 
-### O problema:
+> **Ajuste manual do Prompt 3:**
+> - Algumas classes continham fluxos confusos e, devido à stream sempre ativa, poderia haver race conditions no app. Simplifiquei o fluxo para apenas alguns estados, mantendo o debug simples de acordo com o KISS (código simples é mais fácil de manter, testar e debugar).
+> - Outro fator foi criar um Bloc único para notificação, já que possui outra responsabilidade. O agente o colocou dentro do `PetBloc`, então toda vez que eu tentava emitir uma notificação, era como se o `PetBloc` estivesse sendo atualizado, ferindo o SRP.
+> - Também alterei as dependências para receberem somente classes abstratas (contratos) de acordo com o DIP. Algumas continham implementações concretas e outras instanciavam diretamente algumas classes, o que dificultaria os testes, já que os mocks tornar-se-iam inúteis nesse caso.
 
-  declarar widgets dessa forma no Flutter, ocorrera um perda de performance, porquanto ao utilizar o setState no topo, todos os widgets serao passiveis de rebuild, o Framework verificara cada um deles, ja que eles sao filhos do widget que fora marcado como sujo na arvore, entao o framework verificara cada um deles
+---
+
+#### 4. PROMPT
+
+Todos esses widgets selecionados deveriam ser classes de widgets, e não funções. O Flutter deve renderizá-los e criar seu próprio element na árvore de elementos. Do modo como está, o app terá menos performance. Então, escreva esses widgets em uma pasta `widgets` dentro de `pets/pages/widgets` e mova suas dependências para lá também (como algum dialog ou código síncrono).
+
+```dart
+Widget _buildAppBar(BuildContext context, PetEntity pet) {}
+Widget _buildPetInfo(BuildContext context, PetEntity pet) {}
+Widget _buildInfoRow(IconData icon, String label, String value) {}
+Widget _buildTasksSection(BuildContext context) {}
+Widget _buildTaskItem(BuildContext context, PetTaskEntity task) {}
+Widget _buildTaskTypeChip(TaskType type) {}
+void _showDeleteDialog(BuildContext context) {}
+void _showNotifyDialog(BuildContext context, PetEntity pet) {}
+```
+
+> **O problema de declarar widgets através de funções:** Declarar widgets dessa forma no Flutter acarretará perda de performance, porquanto, ao utilizar o `setState` no topo, todos os widgets serão passíveis de rebuild. O Framework verificará cada um deles, já que são filhos do widget que fora marcado como "sujo" na árvore.
 
 
-  Widget _buildAppBar(BuildContext context, PetEntity pet) {}
+> **O problema de declarar widgets através de funções:** Declarar widgets dessa forma no Flutter acarretará perda de performance, porquanto, ao utilizar o `setState` no topo, todos os widgets serão passíveis de rebuild. O Framework verificará cada um deles, já que são filhos do widget que fora marcado como "sujo" na árvore.
 
-  Widget _buildPetInfo(BuildContext context, PetEntity pet) {}
+> **Ajuste manual do Prompt 4:**
+> Utilizei o pattern Simple Factory para decidir se o carregamento seria do widget pet_create_form ou pet_edit_form no pet_form_page; o mesmo fiz no task_form_page.  
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {}
+---
 
-  Widget _buildTasksSection(BuildContext context) {}
+## Diagramas UML
 
-  Widget _buildTaskItem(BuildContext context, PetTaskEntity task) {}
+Diagramas gerados seguindo a especificação UML 2.0. Arquivos fonte em [docs/uml/](docs/uml/).
 
-  Widget _buildTaskTypeChip(TaskType type) {}
+📄 **[Descrição Completa dos Casos de Uso](docs/uml/use_cases_description.md)** - Documentação detalhada com fluxos, regras de negócio e matriz de rastreabilidade.
 
-  void _showDeleteDialog(BuildContext context) {}
+### Diagrama de Classes
 
-  void _showNotifyDialog(BuildContext context, PetEntity pet) {}
+![Diagrama de Classes](docs/uml/PetKeeperLite_ClassDiagram.png)
 
-### Solucao  
+### Diagrama de Casos de Uso
+
+![Diagrama de Casos de Uso](docs/uml/PetKeeperLite_UseCaseDiagram.png)
+
+### Diagramas de Estado
+
+#### AuthBloc
+![Estado - AuthBloc](docs/uml/AuthBloc_StateDiagram.png)
+
+#### FamilyBloc
+![Estado - FamilyBloc](docs/uml/FamilyBloc_StateDiagram.png)
+
+#### PetBloc
+![Estado - PetBloc](docs/uml/PetBloc_StateDiagram.png)
+
+#### TaskBloc
+![Estado - TaskBloc](docs/uml/TaskBloc_StateDiagram.png)
+
+#### NotificationBloc
+![Estado - NotificationBloc](docs/uml/NotificationBloc_StateDiagram.png)
+
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../domain/entities/pet_entity.dart';
-import '../../../../domain/entities/pet_species.dart';
+import '../../../../core/helpers/pet_species.dart';
 
 class PetInfoCard extends StatelessWidget {
   final PetEntity pet;

@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/entities/pet_entity.dart';
+import 'notify_family_dialog.dart';
 import 'pet_delete_dialog.dart';
-import 'pet_notify_dialog.dart';
 
 class PetDetailAppBar extends StatelessWidget {
   final PetEntity pet;
@@ -21,18 +21,64 @@ class PetDetailAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final screenWidth = MediaQuery.of(context).size.width;
     return SliverAppBar(
       expandedHeight: 250,
       pinned: true,
+      leading: Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          pet.name,
-          style: const TextStyle(
-            shadows: [
-              Shadow(
-                offset: Offset(0, 1),
-                blurRadius: 3,
-                color: Colors.black54,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  pet.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => _showNotifyDialog(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    const Text(
+                      'Notificar família',
+                      style: TextStyle(fontSize: 10, color: Colors.white),
+                    ),
+                    const SizedBox(width: 2),
+                    const Icon(
+                      Icons.notifications_active,
+                      size: 14,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -43,29 +89,27 @@ class PetDetailAppBar extends StatelessWidget {
         ),
       ),
       actions: [
-        IconButton(icon: const Icon(Icons.edit), onPressed: onEdit),
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () => _showDeleteDialog(context),
+        Container(
+          margin: const EdgeInsets.only(right: 4),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.edit, color: Colors.black87),
+            onPressed: onEdit,
+          ),
         ),
-        PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'notify') {
-              _showNotifyDialog(context);
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'notify',
-              child: Row(
-                children: [
-                  Icon(Icons.notifications_active),
-                  SizedBox(width: 8),
-                  Text('Avisar Família'),
-                ],
-              ),
-            ),
-          ],
+        Container(
+          margin: const EdgeInsets.only(right: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _showDeleteDialog(context),
+          ),
         ),
       ],
     );
@@ -120,7 +164,7 @@ class PetDetailAppBar extends StatelessWidget {
   void _showNotifyDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => PetNotifyDialog(
+      builder: (dialogContext) => NotifyFamilyDialog(
         petName: pet.name,
         onSend: (message) {
           Navigator.pop(dialogContext);

@@ -35,6 +35,8 @@ class PetBloc extends Bloc<PetEvent, PetState> {
     on<PetDeleteRequested>(_onDeletePet);
   }
 
+  
+
   Future<void> _onWatchPets(
     PetWatchRequested event,
     Emitter<PetState> emit,

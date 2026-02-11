@@ -1,12 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'google_auth_source.dart';
+/// Contract for Google Sign-In data source
+abstract class GoogleAuthRemoteDataSource {
+  /// Sign in with Google and return credentials
+  Future<AuthCredential?> signIn();
 
-class GoogleAuthSourceImpl implements GoogleAuthSource {
+  /// Sign out from Google
+  Future<void> signOut();
+}
+
+class GoogleAuthRemoteDataSourceImpl implements GoogleAuthRemoteDataSource {
   final GoogleSignIn _googleSignIn;
 
-  GoogleAuthSourceImpl({required GoogleSignIn googleSignIn})
+  GoogleAuthRemoteDataSourceImpl({required GoogleSignIn googleSignIn})
     : _googleSignIn = googleSignIn;
 
   @override

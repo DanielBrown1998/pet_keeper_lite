@@ -3,13 +3,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
-import 'notification_source.dart';
+/// Contract for notification data source (FCM + Cloud Functions)
+abstract class NotificationRemoteDataSource {
+  /// Get FCM token
+  Future<String?> getToken();
 
-class NotificationSourceImpl implements NotificationSource {
+  /// Request notification permission
+  Future<void> requestPermission();
+
+  /// Call notifyFamily cloud function
+  Future<void> notifyFamily({required String petId, required String message});
+}
+
+class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   final FirebaseMessaging _messaging;
   final FirebaseFunctions _functions;
 
-  NotificationSourceImpl({
+  NotificationRemoteDataSourceImpl({
     required FirebaseMessaging messaging,
     required FirebaseFunctions functions,
   }) : _messaging = messaging,
