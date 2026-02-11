@@ -1,6 +1,20 @@
-# PetKeeper Lite
+<p align="center">
+  <img src="app/icon.png" alt="PetKeeper Lite" width="120" style="border-radius: 20px;" />
+</p>
 
-App consumidor para cadastro compartilhado de pets e controle básico de vacinas/tarefas, com foto e sincronização em tempo real.
+<h1 align="center">PetKeeper Lite</h1>
+
+<p align="center">
+  App consumidor para cadastro compartilhado de pets e controle básico de vacinas/tarefas, com foto e sincronização em tempo real.
+</p>
+
+## Screenshots
+
+| Tela 1 | Tela 2 | Tela 3 |
+|:------:|:------:|:------:|
+| ![Tela 1](screenshots/flutter_01.png) | ![Tela 2](screenshots/flutter_02.png) | ![Tela 3](screenshots/flutter_03.png) |
+| ![Tela 4](screenshots/flutter_04.png) | ![Tela 5](screenshots/flutter_05.png) | ![Tela 6](screenshots/flutter_06.png) |
+| ![Tela 7](screenshots/flutter_07.png) | ![Tela 8](screenshots/flutter_08.png) | ![Tela 9](screenshots/flutter_09.png) |
 
 ## Funcionalidades
 
