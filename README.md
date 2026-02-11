@@ -63,9 +63,16 @@ lib/
 
 > **Decisão geral**: Priorizei **previsibilidade** e **testabilidade** sobre simplicidade inicial. O custo de boilerplate do Bloc compensa em projetos médios/grandes onde debugging e manutenção são críticos.
 
-## Apresentação do Projeto
+## Vídeo de Demonstração
 
 [Link para apresentação](https://drive.google.com/drive/folders/1ZyJ54CWpaur7nLk3eI5E-5j0XmPBEk8-?usp=sharing)
+
+Demonstra:
+1. Login com email/senha e Google
+2. Criar/entrar em família com código
+3. CRUD de pets com foto
+4. CRUD de vacinas/tarefas em tempo real
+5. Push notification "Avisar Família"
 
 ## Setup do Projeto
 
@@ -299,16 +306,6 @@ flutter test test/unit/
 flutter test test/widget/
 ```
 
-## Vídeo de Demonstração
-
-[Link do vídeo aqui - máximo 8 minutos]
-
-Demonstra:
-1. Login com email/senha e Google
-2. Criar/entrar em família com código
-3. CRUD de pets com foto
-4. CRUD de vacinas/tarefas em tempo real
-5. Push notification "Avisar Família"
 
 ## Licença
 
