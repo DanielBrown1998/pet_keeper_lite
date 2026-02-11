@@ -479,9 +479,6 @@ void _showNotifyDialog(BuildContext context, PetEntity pet) {}
 
 > **O problema de declarar widgets através de funções:** Declarar widgets dessa forma no Flutter acarretará perda de performance, porquanto, ao utilizar o `setState` no topo, todos os widgets serão passíveis de rebuild. O Framework verificará cada um deles, já que são filhos do widget que fora marcado como "sujo" na árvore.
 
-
-> **O problema de declarar widgets através de funções:** Declarar widgets dessa forma no Flutter acarretará perda de performance, porquanto, ao utilizar o `setState` no topo, todos os widgets serão passíveis de rebuild. O Framework verificará cada um deles, já que são filhos do widget que fora marcado como "sujo" na árvore.
-
 > **Ajuste manual do Prompt 4:**
 > Utilizei o pattern Simple Factory para decidir se o carregamento seria do widget pet_create_form ou pet_edit_form no pet_form_page; o mesmo fiz no task_form_page.  
 
@@ -489,33 +486,9 @@ void _showNotifyDialog(BuildContext context, PetEntity pet) {}
 
 ## Diagramas UML
 
-Diagramas gerados seguindo a especificação UML 2.0. Arquivos fonte em [docs/uml/](docs/uml/).
+Diagramas gerados seguindo a especificação UML 2.0 com o plantuml. Arquivos fonte em [docs/uml/](docs/uml/).
 
-📄 **[Descrição Completa dos Casos de Uso](docs/uml/use_cases_description.md)** - Documentação detalhada com fluxos, regras de negócio e matriz de rastreabilidade.
+**[Descrição Completa dos Casos de Uso](docs/uml/use_cases_description.md)** - Documentação detalhada com fluxos, regras de negócio e matriz de rastreabilidade.
 
-### Diagrama de Classes
-
-![Diagrama de Classes](docs/uml/PetKeeperLite_ClassDiagram.png)
-
-### Diagrama de Casos de Uso
-
-![Diagrama de Casos de Uso](docs/uml/PetKeeperLite_UseCaseDiagram.png)
-
-### Diagramas de Estado
-
-#### AuthBloc
-![Estado - AuthBloc](docs/uml/AuthBloc_StateDiagram.png)
-
-#### FamilyBloc
-![Estado - FamilyBloc](docs/uml/FamilyBloc_StateDiagram.png)
-
-#### PetBloc
-![Estado - PetBloc](docs/uml/PetBloc_StateDiagram.png)
-
-#### TaskBloc
-![Estado - TaskBloc](docs/uml/TaskBloc_StateDiagram.png)
-
-#### NotificationBloc
-![Estado - NotificationBloc](docs/uml/NotificationBloc_StateDiagram.png)
 
 
