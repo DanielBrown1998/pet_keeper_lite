@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "341762936537",
+    "project_id": "petkeeper-lite-1002",
+    "storage_bucket": "petkeeper-lite-1002.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341762936537:android:3b5d886e7b0d429515f8c8",
+        "android_client_info": {
+          "package_name": "com.petkeeper.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341762936537-hvmvpfjr2rvmmbs51vhpoao0i71oikco.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.petkeeper.app",
+            "certificate_hash": "ca5a1db4dba5cc0cb191158e6b6622d7d34f0fba"
+          }
+        },
+        {
+          "client_id": "341762936537-bufbh7l4ca8lqaml7rttme0egnu40gq2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFfihzEyCfQb1O7Sy8ynbz9xhYxNH-sVw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341762936537-bufbh7l4ca8lqaml7rttme0egnu40gq2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "341762936537-4q8qpcjoh03caau5ei39ckvvm071fsel.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.petkeeper.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
