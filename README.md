@@ -502,7 +502,7 @@ void _showNotifyDialog(BuildContext context, PetEntity pet) {}
 
 Diagramas gerados seguindo a especificação UML 2.0 com o plantuml. Arquivos fonte em [docs/uml/](docs/uml/).
 
-**[Descrição Completa dos Casos de Uso](docs/uml/use_cases_description.md)** - Documentação detalhada com fluxos, regras de negócio e matriz de rastreabilidade.
+**[Descrição Completa dos Casos de Uso](docs/use_cases_description.md)** - Documentação detalhada com fluxos, regras de negócio e matriz de rastreabilidade.
 
 
 
