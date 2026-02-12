@@ -1,5 +1,8 @@
+import 'package:app/presentation/notification/bloc/notification_bloc.dart';
+import 'package:app/presentation/notification/bloc/notification_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../domain/entities/pet_entity.dart';
 import 'notify_family_dialog.dart';
@@ -45,7 +48,10 @@ class PetDetailAppBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(16),
@@ -58,27 +64,48 @@ class PetDetailAppBar extends StatelessWidget {
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () => _showNotifyDialog(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    const Text(
-                      'Notificar família',
-                      style: TextStyle(fontSize: 10, color: Colors.white),
+              BlocBuilder<NotificationBloc, NotificationState>(
+                builder: (context, state) {
+                  return ElevatedButton(
+                    onPressed: () => _showNotifyDialog(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                     ),
-                    const SizedBox(width: 2),
-                    const Icon(
-                      Icons.notifications_active,
-                      size: 14,
-                      color: Colors.white,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Text(
+                          (state is NotificationSendingState)
+                              ? 'Enviando...'
+                              : 'Notificar família',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        (state is NotificationSendingState)
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.notifications_active,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ],
           ),
