@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_entity.dart';
 import '../../../../core/helpers/pet_species.dart';
 import '../../../auth/bloc/auth_bloc.dart';
@@ -56,7 +58,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao selecionar imagem'),
+            content: TextPetKeeper('Erro ao selecionar imagem'),
             backgroundColor: Colors.red,
           ),
         );
@@ -77,7 +79,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao tirar foto'),
+            content: TextPetKeeper('Erro ao tirar foto'),
             backgroundColor: Colors.red,
           ),
         );
@@ -107,7 +109,9 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
 
       if (familyCode == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro: família não encontrada')),
+          const SnackBar(
+            content: TextPetKeeper('Erro: família não encontrada'),
+          ),
         );
         return;
       }
@@ -131,8 +135,9 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Pet')),
+      appBar: AppBar(title: const TextPetKeeper('Adicionar Pet')),
       body: BlocConsumer<PetBloc, PetState>(
         listener: (context, state) {
           if (state.successMessage != null) {
@@ -141,7 +146,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -229,7 +234,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
                       items: PetSpecies.values.map((species) {
                         return DropdownMenuItem(
                           value: species,
-                          child: Text(species.displayNameWithEmoji),
+                          child: TextPetKeeper(species.displayNameWithEmoji),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -306,7 +311,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
+                          : const TextPetKeeper(
                               'Adicionar Pet',
                               style: TextStyle(fontSize: 16),
                             ),
@@ -331,7 +336,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: const Text('Tirar Foto'),
+                title: const TextPetKeeper('Tirar Foto'),
                 onTap: () {
                   Navigator.pop(context);
                   _takePhoto();
@@ -339,7 +344,7 @@ class _PetFormCreatePageState extends State<PetFormCreatePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Escolher da Galeria'),
+                title: const TextPetKeeper('Escolher da Galeria'),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage();

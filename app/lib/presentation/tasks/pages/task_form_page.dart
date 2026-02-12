@@ -11,6 +11,7 @@ class TaskFormPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     if (taskId == null) {
       return TaskFormCreatePage(petId: petId);
     }

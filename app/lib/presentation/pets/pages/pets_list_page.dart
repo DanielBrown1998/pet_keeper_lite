@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../../../core/helpers/pet_species.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
@@ -35,6 +37,7 @@ class _PetsListPageState extends State<PetsListPage> {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (!state.isAuthenticated) {
@@ -59,9 +62,10 @@ class _PetsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meus Pets'),
+        title: const TextPetKeeper('Meus Pets'),
         actions: [
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
@@ -72,7 +76,7 @@ class _PetsListView extends StatelessWidget {
                   message: 'Toque para copiar',
                   child: ActionChip(
                     avatar: const Icon(Icons.family_restroom, size: 16),
-                    label: Text(
+                    label: TextPetKeeper(
                       familyCode,
                       style: const TextStyle(fontSize: 12),
                     ),
@@ -82,7 +86,7 @@ class _PetsListView extends StatelessWidget {
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
+                                content: TextPetKeeper(
                                   'Código da família "$familyCode" copiado!',
                                 ),
                                 duration: const Duration(seconds: 2),
@@ -111,7 +115,7 @@ class _PetsListView extends StatelessWidget {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -119,7 +123,7 @@ class _PetsListView extends StatelessWidget {
           if (state.successMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.successMessage!),
+                content: TextPetKeeper(state.successMessage!),
                 backgroundColor: Colors.green,
               ),
             );
@@ -137,14 +141,14 @@ class _PetsListView extends StatelessWidget {
                 children: [
                   const Icon(Icons.pets, size: 80, color: Colors.grey),
                   const SizedBox(height: 16),
-                  Text(
+                  TextPetKeeper(
                     'Nenhum pet cadastrado',
                     style: Theme.of(
                       context,
                     ).textTheme.titleMedium?.copyWith(color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  const TextPetKeeper(
                     'Toque no + para adicionar seu primeiro pet',
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -208,10 +212,11 @@ class _PetsListView extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                TextPetKeeper(
                                   pet.name,
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
@@ -222,7 +227,7 @@ class _PetsListView extends StatelessWidget {
                                       color: Colors.grey[600],
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
+                                    TextPetKeeper(
                                       PetSpecies.fromValue(
                                         pet.species,
                                       ).displayName,
@@ -232,7 +237,7 @@ class _PetsListView extends StatelessWidget {
                                 ),
                                 if (pet.weightKg != null) ...[
                                   const SizedBox(height: 4),
-                                  Text(
+                                  TextPetKeeper(
                                     '${pet.weightKg!.toStringAsFixed(1)} kg',
                                     style: TextStyle(color: Colors.grey[600]),
                                   ),
@@ -255,7 +260,7 @@ class _PetsListView extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go('/pets/add'),
         icon: const Icon(Icons.add),
-        label: const Text('Adicionar Pet'),
+        label: const TextPetKeeper('Adicionar Pet'),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),

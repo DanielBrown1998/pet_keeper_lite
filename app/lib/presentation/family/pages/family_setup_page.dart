@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
 import '../bloc/family_bloc.dart';
@@ -39,9 +41,10 @@ class _FamilySetupPageState extends State<FamilySetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configurar Família'),
+        title: const TextPetKeeper('Configurar Família'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -59,7 +62,7 @@ class _FamilySetupPageState extends State<FamilySetupPage> {
           } else if (state.isError && state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -80,16 +83,17 @@ class _FamilySetupPageState extends State<FamilySetupPage> {
                       color: Colors.teal,
                     ),
                     const SizedBox(height: 24),
-                    Text(
+                    TextPetKeeper(
                       'Código de Família',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    TextPetKeeper(
                       'O código de família permite que você compartilhe seus pets com outros membros da família.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.grey[600],
                       ),
                       textAlign: TextAlign.center,
@@ -99,12 +103,12 @@ class _FamilySetupPageState extends State<FamilySetupPage> {
                       segments: const [
                         ButtonSegment<bool>(
                           value: true,
-                          label: Text('Criar Família'),
+                          label: TextPetKeeper('Criar Família'),
                           icon: Icon(Icons.add),
                         ),
                         ButtonSegment<bool>(
                           value: false,
-                          label: Text('Entrar em Família'),
+                          label: TextPetKeeper('Entrar em Família'),
                           icon: Icon(Icons.login),
                         ),
                       ],
@@ -160,7 +164,7 @@ class _FamilySetupPageState extends State<FamilySetupPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : Text(
+                          : TextPetKeeper(
                               _isCreating
                                   ? 'Criar Família'
                                   : 'Entrar na Família',
@@ -181,17 +185,16 @@ class _FamilySetupPageState extends State<FamilySetupPage> {
                                   color: Colors.teal,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
+                                TextPetKeeper(
                                   'Como funciona?',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            const Text(
+                            const TextPetKeeper(
                               '• Crie um código único para sua família\n'
                               '• Compartilhe o código com outros membros\n'
                               '• Todos com o mesmo código verão os mesmos pets\n'

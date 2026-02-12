@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_task_entity.dart';
 import '../../../tasks/bloc/task_bloc.dart';
 import '../../../tasks/bloc/task_event.dart';
@@ -42,6 +44,7 @@ class _TasksSectionState extends State<TasksSection> {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return BlocBuilder<TaskBloc, TaskState>(
       buildWhen: (previous, current) =>
           previous.tasks != current.tasks ||
@@ -81,14 +84,15 @@ class _TasksHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
+        TextPetKeeper(
           'Vacinas & Tarefas',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         if (isLoading)
           const SizedBox(
@@ -106,10 +110,11 @@ class _EmptyTasksMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 16),
       child: Center(
-        child: Text(
+        child: TextPetKeeper(
           'Nenhuma tarefa cadastrada',
           style: TextStyle(color: Colors.grey),
         ),
@@ -131,6 +136,7 @@ class _TasksList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

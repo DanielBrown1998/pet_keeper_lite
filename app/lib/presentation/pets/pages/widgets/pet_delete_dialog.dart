@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 class PetDeleteDialog extends StatelessWidget {
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
@@ -12,18 +14,19 @@ class PetDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return AlertDialog(
-      title: const Text('Excluir Pet'),
-      content: const Text(
+      title: const TextPetKeeper('Excluir Pet'),
+      content: const TextPetKeeper(
         'Tem certeza que deseja excluir este pet? '
         'Todas as vacinas e tarefas também serão removidas.',
       ),
       actions: [
-        TextButton(onPressed: onCancel, child: const Text('Cancelar')),
+        TextButton(onPressed: onCancel, child: const TextPetKeeper('Cancelar')),
         TextButton(
           onPressed: onConfirm,
           style: TextButton.styleFrom(foregroundColor: Colors.red),
-          child: const Text('Excluir'),
+          child: const TextPetKeeper('Excluir'),
         ),
       ],
     );

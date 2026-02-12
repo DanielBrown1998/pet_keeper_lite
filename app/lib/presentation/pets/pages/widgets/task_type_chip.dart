@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_task_entity.dart';
 
 class TaskTypeChip extends StatelessWidget {
@@ -9,21 +11,22 @@ class TaskTypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     final (color, label, icon) = _getTypeData();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withAlpha(127)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(fontSize: 12, color: color)),
+          TextPetKeeper(label, style: TextStyle(fontSize: 12, color: color)),
         ],
       ),
     );

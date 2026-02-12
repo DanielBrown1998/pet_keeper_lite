@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -43,13 +45,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -66,16 +69,16 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 48),
                   const Icon(Icons.pets, size: 80, color: Colors.teal),
                   const SizedBox(height: 16),
-                  Text(
+                  TextPetKeeper(
                     'PetKeeper Lite',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.teal,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  TextPetKeeper(
                     'Cuide dos seus pets em família',
                     style: Theme.of(
                       context,
@@ -151,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
+                            : const TextPetKeeper(
                                 'Entrar',
                                 style: TextStyle(fontSize: 16),
                               ),
@@ -164,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(child: Divider()),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('ou'),
+                        child: TextPetKeeper('ou'),
                       ),
                       Expanded(child: Divider()),
                     ],
@@ -181,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                           errorBuilder: (_, __, ___) =>
                               const Icon(Icons.g_mobiledata),
                         ),
-                        label: const Text('Continuar com Google'),
+                        label: const TextPetKeeper('Continuar com Google'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
@@ -192,10 +195,10 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Não tem uma conta?'),
+                      const TextPetKeeper('Não tem uma conta?'),
                       TextButton(
                         onPressed: () => context.go('/register'),
-                        child: const Text('Cadastre-se'),
+                        child: const TextPetKeeper('Cadastre-se'),
                       ),
                     ],
                   ),

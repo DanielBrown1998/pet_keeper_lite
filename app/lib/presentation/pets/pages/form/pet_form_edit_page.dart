@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_entity.dart';
 import '../../../../core/helpers/pet_species.dart';
 import '../../../auth/bloc/auth_bloc.dart';
@@ -81,7 +83,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao selecionar imagem'),
+            content: TextPetKeeper('Erro ao selecionar imagem'),
             backgroundColor: Colors.red,
           ),
         );
@@ -102,7 +104,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Erro ao tirar foto'),
+            content: TextPetKeeper('Erro ao tirar foto'),
             backgroundColor: Colors.red,
           ),
         );
@@ -129,7 +131,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
     if (_formKey.currentState?.validate() ?? false) {
       if (_existingPet == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro: pet não encontrado')),
+          const SnackBar(content: TextPetKeeper('Erro: pet não encontrado')),
         );
         return;
       }
@@ -139,7 +141,9 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
 
       if (familyCode == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro: família não encontrada')),
+          const SnackBar(
+            content: TextPetKeeper('Erro: família não encontrada'),
+          ),
         );
         return;
       }
@@ -163,15 +167,16 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     if (_existingPet == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Editar Pet')),
-        body: const Center(child: Text('Pet não encontrado')),
+        appBar: AppBar(title: const TextPetKeeper('Editar Pet')),
+        body: const Center(child: TextPetKeeper('Pet não encontrado')),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Pet')),
+      appBar: AppBar(title: const TextPetKeeper('Editar Pet')),
       body: BlocConsumer<PetBloc, PetState>(
         listener: (context, state) {
           if (state.successMessage != null) {
@@ -180,7 +185,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -273,7 +278,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
                       items: PetSpecies.values.map((species) {
                         return DropdownMenuItem(
                           value: species,
-                          child: Text(species.displayNameWithEmoji),
+                          child: TextPetKeeper(species.displayNameWithEmoji),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -350,7 +355,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
+                          : const TextPetKeeper(
                               'Salvar Alterações',
                               style: TextStyle(fontSize: 16),
                             ),
@@ -375,7 +380,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: const Text('Tirar Foto'),
+                title: const TextPetKeeper('Tirar Foto'),
                 onTap: () {
                   Navigator.pop(context);
                   _takePhoto();
@@ -383,7 +388,7 @@ class _PetFormEditPageState extends State<PetFormEditPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Escolher da Galeria'),
+                title: const TextPetKeeper('Escolher da Galeria'),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage();

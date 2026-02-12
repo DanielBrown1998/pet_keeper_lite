@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 class NotifyFamilyDialog extends StatefulWidget {
   final String petName;
   final void Function(String message) onSend;
@@ -27,12 +29,15 @@ class _NotifyFamilyDialogState extends State<NotifyFamilyDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return AlertDialog(
-      title: const Text('Avisar Família'),
+      title: const TextPetKeeper('Avisar Família'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Envie uma notificação para todos os membros da família.'),
+          const TextPetKeeper(
+            'Envie uma notificação para todos os membros da família.',
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _messageController,
@@ -46,14 +51,17 @@ class _NotifyFamilyDialogState extends State<NotifyFamilyDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: widget.onCancel, child: const Text('Cancelar')),
+        TextButton(
+          onPressed: widget.onCancel,
+          child: const TextPetKeeper('Cancelar'),
+        ),
         ElevatedButton(
           onPressed: () {
             if (_messageController.text.isNotEmpty) {
               widget.onSend(_messageController.text);
             }
           },
-          child: const Text('Enviar'),
+          child: const TextPetKeeper('Enviar'),
         ),
       ],
     );

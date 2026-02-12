@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_entity.dart';
 import 'notify_family_dialog.dart';
 import 'pet_delete_dialog.dart';
@@ -24,6 +26,7 @@ class PetDetailAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     // final screenWidth = MediaQuery.of(context).size.width;
     return SliverAppBar(
       expandedHeight: 250,
@@ -31,7 +34,7 @@ class PetDetailAppBar extends StatelessWidget {
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withAlpha(229),
           shape: BoxShape.circle,
         ),
         child: IconButton(
@@ -56,7 +59,7 @@ class PetDetailAppBar extends StatelessWidget {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
+                child: TextPetKeeper(
                   pet.name,
                   style: const TextStyle(
                     color: Colors.white,
@@ -69,7 +72,7 @@ class PetDetailAppBar extends StatelessWidget {
                   return ElevatedButton(
                     onPressed: () => _showNotifyDialog(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      backgroundColor: theme.colorScheme.primary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
@@ -78,7 +81,7 @@ class PetDetailAppBar extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text(
+                        TextPetKeeper(
                           (state is NotificationSendingState)
                               ? 'Enviando...'
                               : 'Notificar família',
@@ -119,7 +122,7 @@ class PetDetailAppBar extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(right: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withAlpha(229),
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -130,7 +133,7 @@ class PetDetailAppBar extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withAlpha(229),
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -169,7 +172,7 @@ class PetDetailAppBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+          colors: [Colors.transparent, Colors.black.withAlpha(178)],
         ),
       ),
     );

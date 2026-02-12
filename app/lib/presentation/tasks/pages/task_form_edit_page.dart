@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../../../domain/entities/pet_task_entity.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../bloc/task_bloc.dart';
@@ -80,7 +82,7 @@ class _TaskFormEditPageState extends State<TaskFormEditPage> {
     if (_formKey.currentState?.validate() ?? false) {
       if (_existingTask == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro: tarefa não encontrada')),
+          const SnackBar(content: TextPetKeeper('Erro: tarefa não encontrada')),
         );
         return;
       }
@@ -90,7 +92,9 @@ class _TaskFormEditPageState extends State<TaskFormEditPage> {
 
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro: usuário não encontrado')),
+          const SnackBar(
+            content: TextPetKeeper('Erro: usuário não encontrado'),
+          ),
         );
         return;
       }
@@ -115,15 +119,16 @@ class _TaskFormEditPageState extends State<TaskFormEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (_existingTask == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Editar Tarefa')),
-        body: const Center(child: Text('Tarefa não encontrada')),
+        appBar: AppBar(title: const TextPetKeeper('Editar Tarefa')),
+        body: const Center(child: TextPetKeeper('Tarefa não encontrada')),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Tarefa')),
+      appBar: AppBar(title: const TextPetKeeper('Editar Tarefa')),
       body: BlocConsumer<TaskBloc, TaskState>(
         listenWhen: (previous, current) =>
             previous.error != current.error ||
@@ -135,7 +140,7 @@ class _TaskFormEditPageState extends State<TaskFormEditPage> {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -153,23 +158,23 @@ class _TaskFormEditPageState extends State<TaskFormEditPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Task type
-                    Text('Tipo', style: Theme.of(context).textTheme.titleSmall),
+                    TextPetKeeper('Tipo', style: theme.textTheme.titleSmall),
                     const SizedBox(height: 8),
                     SegmentedButton<TaskType>(
                       segments: const [
                         ButtonSegment<TaskType>(
                           value: TaskType.vaccine,
-                          label: Text('Vacina'),
+                          label: TextPetKeeper('Vacina'),
                           icon: Icon(Icons.vaccines),
                         ),
                         ButtonSegment<TaskType>(
                           value: TaskType.grooming,
-                          label: Text('Banho'),
+                          label: TextPetKeeper('Banho'),
                           icon: Icon(Icons.bathtub),
                         ),
                         ButtonSegment<TaskType>(
                           value: TaskType.other,
-                          label: Text('Outro'),
+                          label: TextPetKeeper('Outro'),
                           icon: Icon(Icons.task),
                         ),
                       ],
@@ -264,7 +269,7 @@ class _TaskFormEditPageState extends State<TaskFormEditPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
+                          : const TextPetKeeper(
                               'Salvar Alterações',
                               style: TextStyle(fontSize: 16),
                             ),

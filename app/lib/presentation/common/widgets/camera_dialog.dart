@@ -4,6 +4,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 class CameraDialog extends StatefulWidget {
   const CameraDialog({super.key});
 
@@ -188,6 +190,7 @@ class _CameraDialogState extends State<CameraDialog>
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
       backgroundColor: Colors.black,
@@ -208,7 +211,7 @@ class _CameraDialogState extends State<CameraDialog>
                     icon: const Icon(Icons.close, color: Colors.white),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
-                  const Text(
+                  const TextPetKeeper(
                     'Tirar Foto',
                     style: TextStyle(
                       color: Colors.white,
@@ -303,7 +306,7 @@ class _CameraDialogState extends State<CameraDialog>
               children: [
                 const Icon(Icons.error_outline, color: Colors.red, size: 48),
                 const SizedBox(height: 16),
-                Text(
+                TextPetKeeper(
                   _error!,
                   style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
@@ -311,7 +314,7 @@ class _CameraDialogState extends State<CameraDialog>
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _initCamera,
-                  child: const Text('Tentar novamente'),
+                  child: const TextPetKeeper('Tentar novamente'),
                 ),
               ],
             ),

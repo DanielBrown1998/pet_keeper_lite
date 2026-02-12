@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../../../domain/entities/pet_task_entity.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../bloc/task_bloc.dart';
@@ -55,7 +57,9 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
 
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro: usuário não encontrado')),
+          const SnackBar(
+            content: TextPetKeeper('Erro: usuário não encontrado'),
+          ),
         );
         return;
       }
@@ -80,8 +84,9 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Tarefa')),
+      appBar: AppBar(title: const TextPetKeeper('Adicionar Tarefa')),
       body: BlocConsumer<TaskBloc, TaskState>(
         listenWhen: (previous, current) =>
             previous.error != current.error ||
@@ -93,7 +98,7 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -111,23 +116,23 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Task type
-                    Text('Tipo', style: Theme.of(context).textTheme.titleSmall),
+                    TextPetKeeper('Tipo', style: theme.textTheme.titleSmall),
                     const SizedBox(height: 8),
                     SegmentedButton<TaskType>(
                       segments: const [
                         ButtonSegment<TaskType>(
                           value: TaskType.vaccine,
-                          label: Text('Vacina'),
+                          label: TextPetKeeper('Vacina'),
                           icon: Icon(Icons.vaccines),
                         ),
                         ButtonSegment<TaskType>(
                           value: TaskType.grooming,
-                          label: Text('Banho'),
+                          label: TextPetKeeper('Banho'),
                           icon: Icon(Icons.bathtub),
                         ),
                         ButtonSegment<TaskType>(
                           value: TaskType.other,
-                          label: Text('Outro'),
+                          label: TextPetKeeper('Outro'),
                           icon: Icon(Icons.task),
                         ),
                       ],
@@ -222,7 +227,7 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
+                          : const TextPetKeeper(
                               'Adicionar Tarefa',
                               style: TextStyle(fontSize: 16),
                             ),
@@ -231,9 +236,9 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
                     // Quick add suggestions for vaccines
                     if (_selectedType == TaskType.vaccine) ...[
                       const SizedBox(height: 24),
-                      Text(
+                      TextPetKeeper(
                         'Sugestões rápidas:',
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: theme.textTheme.titleSmall,
                       ),
                       const SizedBox(height: 8),
                       Wrap(
@@ -260,7 +265,7 @@ class _TaskFormCreatePageState extends State<TaskFormCreatePage> {
 
   Widget _buildSuggestionChip(String label) {
     return ActionChip(
-      label: Text(label),
+      label: TextPetKeeper(label),
       onPressed: () {
         _titleController.text = label;
       },

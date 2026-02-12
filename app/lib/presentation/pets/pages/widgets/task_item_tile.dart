@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_task_entity.dart';
 import 'task_type_chip.dart';
 
@@ -20,13 +22,14 @@ class TaskItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Checkbox(
         value: task.done,
         onChanged: (value) => onToggleDone(value ?? false),
       ),
-      title: Text(
+      title: TextPetKeeper(
         task.title,
         style: TextStyle(
           decoration: task.done ? TextDecoration.lineThrough : null,
@@ -34,7 +37,7 @@ class TaskItemTile extends StatelessWidget {
         ),
       ),
       subtitle: task.dueDate != null
-          ? Text(
+          ? TextPetKeeper(
               DateFormat('dd/MM/yyyy').format(task.dueDate!),
               style: TextStyle(
                 color: _isOverdue(task.dueDate!) && !task.done
@@ -66,6 +69,7 @@ class _TaskPopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'edit') {
@@ -81,7 +85,7 @@ class _TaskPopupMenu extends StatelessWidget {
             children: [
               Icon(Icons.edit, size: 20),
               SizedBox(width: 8),
-              Text('Editar'),
+              TextPetKeeper('Editar'),
             ],
           ),
         ),
@@ -91,7 +95,7 @@ class _TaskPopupMenu extends StatelessWidget {
             children: [
               Icon(Icons.delete, size: 20, color: Colors.red),
               SizedBox(width: 8),
-              Text('Excluir', style: TextStyle(color: Colors.red)),
+              TextPetKeeper('Excluir', style: TextStyle(color: Colors.red)),
             ],
           ),
         ),

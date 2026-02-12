@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/text_pet_keeper.dart';
+
 import '../../../../domain/entities/pet_entity.dart';
 import '../../../../core/helpers/pet_species.dart';
 
@@ -11,6 +13,7 @@ class PetInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
@@ -18,11 +21,11 @@ class PetInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TextPetKeeper(
               'Informações',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const Divider(),
             _InfoRow(
@@ -81,15 +84,16 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Icon(icon, size: 20, color: Colors.grey[600]),
           const SizedBox(width: 12),
-          Text('$label: ', style: TextStyle(color: Colors.grey[600])),
+          TextPetKeeper('$label: ', style: TextStyle(color: Colors.grey[600])),
           Expanded(
-            child: Text(
+            child: TextPetKeeper(
               value,
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),

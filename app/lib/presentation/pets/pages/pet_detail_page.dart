@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../../notification/bloc/notification_bloc.dart';
 import '../../notification/bloc/notification_event.dart';
 import '../../notification/bloc/notification_state.dart';
@@ -19,6 +21,7 @@ class PetDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return _PetDetailView(petId: petId);
   }
 }
@@ -30,6 +33,7 @@ class _PetDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final theme = Theme.of(context);
     return BlocBuilder<PetBloc, PetState>(
       builder: (context, petState) {
         final pet = petState.pets.where((p) => p.id == petId).firstOrNull;
@@ -37,7 +41,7 @@ class _PetDetailView extends StatelessWidget {
         if (pet == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Pet não encontrado')),
+            body: const Center(child: TextPetKeeper('Pet não encontrado')),
           );
         }
 
@@ -49,7 +53,7 @@ class _PetDetailView extends StatelessWidget {
             if (state is NotificationSuccessState) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message),
+                  content: TextPetKeeper(state.message),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -58,7 +62,7 @@ class _PetDetailView extends StatelessWidget {
               debugPrint('Notification error: ${state.error}');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Envio da Notificacao falhou!"),
+                  content: TextPetKeeper("Envio da Notificacao falhou!"),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -97,7 +101,7 @@ class _PetDetailView extends StatelessWidget {
             floatingActionButton: FloatingActionButton.extended(
               onPressed: () => context.go('/pets/$petId/tasks/add'),
               icon: const Icon(Icons.add),
-              label: const Text('Adicionar Tarefa'),
+              label: const TextPetKeeper('Adicionar Tarefa'),
               backgroundColor: Colors.teal,
               foregroundColor: Colors.white,
             ),

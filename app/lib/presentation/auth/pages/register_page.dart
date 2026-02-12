@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/text_pet_keeper.dart';
+
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -45,6 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -57,7 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
           if (state.error != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.error!),
+                content: TextPetKeeper(state.error!),
                 backgroundColor: Colors.red,
               ),
             );
@@ -73,9 +76,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   const Icon(Icons.pets, size: 60, color: Colors.teal),
                   const SizedBox(height: 16),
-                  Text(
+                  TextPetKeeper(
                     'Criar Conta',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -196,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
+                            : const TextPetKeeper(
                                 'Cadastrar',
                                 style: TextStyle(fontSize: 16),
                               ),
@@ -207,10 +210,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Já tem uma conta?'),
+                      const TextPetKeeper('Já tem uma conta?'),
                       TextButton(
                         onPressed: () => context.go('/login'),
-                        child: const Text('Entrar'),
+                        child: const TextPetKeeper('Entrar'),
                       ),
                     ],
                   ),
