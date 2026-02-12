@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/di/injection_container.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/splash_screen.dart';
 import 'domain/usecases/auth/get_current_user.dart';
 import 'domain/usecases/auth/sign_in_with_email.dart';
 import 'domain/usecases/auth/sign_in_with_google.dart';
@@ -53,24 +54,43 @@ const String localMachineIp = '192.168.1.5';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const SplashWrapper());
+}
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  if (!useEmulators) {
-    // Initialize Firebase App Check
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
+class SplashWrapper extends StatelessWidget {
+  const SplashWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SplashScreen(
+      loadDependencies: () async {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        await configureDependencies();
+
+        if (!useEmulators) {
+          await FirebaseAppCheck.instance.activate(
+            androidProvider: AndroidProvider.debug,
+            appleProvider: AppleProvider.debug,
+          );
+        }
+
+        if (useEmulators && kDebugMode) {
+          await _configureEmulators();
+        }
+
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
+
+        await Future.delayed(
+          const Duration(milliseconds: 1500),
+        ); // Simulate loading time
+      },
+      child: const MyApp(),
     );
   }
-  if (useEmulators && kDebugMode) {
-    await _configureEmulators();
-  }
-
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  await configureDependencies();
-
-  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
